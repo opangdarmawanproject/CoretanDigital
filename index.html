@@ -4,247 +4,533 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FREE Ai by OpangDarmawan - Image to Image</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        /* Desain UI CSS - Dark Mode Modern & Glassmorphism */
+        :root {
+            --primary: #00ff88;
+            --bg-dark: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.8);
+            --text-light: #f8fafc;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at top right, #1e293b, #0f172a);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Tampilan Login */
+        #login-screen {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        #login-screen h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .input-group {
+            margin: 20px 0;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.2);
+            color: white;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        button {
+            background: var(--primary);
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        button:hover {
+            background: #00cc6a;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
+        }
+
+        /* Tampilan Utama Aplikasi */
+        #app-screen {
+            display: none; /* Disembunyikan sebelum login */
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .header p {
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .sidebar {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #cbd5e1;
+        }
+
+        select, input[type="range"], input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            box-sizing: border-box;
+        }
+
+        .canvas-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .canvas-area {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .canvas-container {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+
+        .canvas-container h3 {
+            margin-top: 0;
+            color: #cbd5e1;
+            font-size: 16px;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            background: #000;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        #loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
         .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
+            border: 4px solid rgba(255,255,255,0.1);
+            border-left-color: var(--primary);
             border-radius: 50%;
-            border-top: 4px solid white;
-            width: 24px;
-            height: 24px;
+            width: 40px;
+            height: 40px;
             animation: spin 1s linear infinite;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .secure-badge {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #4ade80;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
         }
-        /* Hide scrollbar for clean embed */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .error-msg {
+            color: #ef4444;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* Style untuk file upload custom */
+        .file-upload-btn {
+            background: rgba(255,255,255,0.1);
+            border: 2px dashed rgba(255,255,255,0.3);
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .file-upload-btn:hover {
+            border-color: var(--primary);
+            background: rgba(0, 255, 136, 0.05);
+        }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen text-slate-800 flex items-center justify-center p-4">
+<body>
 
-    <div class="w-full max-w-3xl bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100">
-        <!-- Header -->
-        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-white text-center">
-            <h1 class="text-3xl font-extrabold tracking-tight">FREE Ai by OpangDarmawan</h1>
-            <p class="text-indigo-100 mt-2 text-sm">Image-to-Image Generator (Powered by AI)</p>
+    <!-- Layar Login -->
+    <div id="login-screen">
+        <h1>FREE Ai by OpangDarmawan</h1>
+        <p>Akses Image-to-Image AI 100% Offline</p>
+        <div class="input-group">
+            <input type="text" id="passcode" placeholder="Ketik: FREE Ai by OpangDarmawan" autocomplete="off">
+            <div id="login-error" class="error-msg">Akses ditolak. Cek penulisan.</div>
         </div>
-
-        <div class="p-6 md:p-8 space-y-6">
-            <!-- Upload Section -->
-            <div class="space-y-2">
-                <label class="block text-sm font-semibold text-slate-700">1. Unggah Gambar Awal</label>
-                <div class="flex items-center justify-center w-full">
-                    <label for="image-upload" class="flex flex-col items-center justify-center w-full h-48 border-2 border-slate-300 border-dashed rounded-xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition relative overflow-hidden group">
-                        <div id="upload-placeholder" class="flex flex-col items-center justify-center pt-5 pb-6">
-                            <i class="fa-solid fa-cloud-arrow-up text-4xl text-slate-400 mb-3 group-hover:text-indigo-500 transition"></i>
-                            <p class="mb-2 text-sm text-slate-500"><span class="font-semibold">Klik untuk unggah</span> atau seret gambar</p>
-                            <p class="text-xs text-slate-400">PNG, JPG, JPEG</p>
-                        </div>
-                        <img id="image-preview" class="absolute inset-0 w-full h-full object-contain hidden bg-black/5" alt="Preview Gambar">
-                        <input id="image-upload" type="file" class="hidden" accept="image/*" />
-                    </label>
-                </div>
-            </div>
-
-            <!-- Prompt Section -->
-            <div class="space-y-2">
-                <label for="prompt" class="block text-sm font-semibold text-slate-700">2. Deskripsikan Perubahan (Prompt)</label>
-                <textarea id="prompt" rows="3" class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition outline-none resize-none" placeholder="Contoh: Ubah gambar ini menjadi gaya lukisan cat air, atau tambahkan kacamata hitam..."></textarea>
-            </div>
-
-            <!-- Action Button -->
-            <button id="generate-btn" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg transform transition hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-indigo-300 flex justify-center items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
-                <i class="fa-solid fa-wand-magic-sparkles"></i>
-                <span id="btn-text">Hasilkan Gambar</span>
-                <div id="btn-spinner" class="spinner hidden"></div>
-            </button>
-
-            <!-- Error Message -->
-            <div id="error-message" class="hidden p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 border border-red-200 text-center">
-            </div>
-
-            <!-- Result Section -->
-            <div id="result-section" class="hidden space-y-2 pt-4 border-t border-slate-100">
-                <label class="block text-sm font-semibold text-slate-700">Hasil Gambar</label>
-                <div class="rounded-xl overflow-hidden border border-slate-200 bg-slate-100 flex items-center justify-center min-h-[300px] relative">
-                    <img id="result-image" class="max-w-full max-h-[500px] object-contain" alt="Hasil AI">
-                    <a id="download-btn" href="#" download="OpangDarmawan_AI_Result.jpg" class="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm text-slate-800 hover:text-indigo-600 p-3 rounded-full shadow-lg transition" title="Unduh Gambar">
-                        <i class="fa-solid fa-download"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="bg-slate-50 p-4 text-center text-xs text-slate-400 border-t border-slate-100">
-            &copy; 2026 FREE Ai by OpangDarmawan. All rights reserved.
+        <button onclick="checkLogin()">Masuk (Secure Local)</button>
+        <div class="secure-badge">
+            🔒 100% Aman - Tidak ada data yang dikirim ke internet
         </div>
     </div>
 
+    <!-- Layar Utama Aplikasi -->
+    <div id="app-screen">
+        <div class="header">
+            <h1>FREE Ai by OpangDarmawan</h1>
+            <p>Sistem Generasi AI Lokal Tanpa Batas (Offline Mode)</p>
+        </div>
+
+        <div class="grid-container">
+            <!-- Sidebar Kontrol -->
+            <div class="sidebar">
+                <div class="control-group">
+                    <label>1. Unggah Gambar Dasar</label>
+                    <label class="file-upload-btn">
+                        <span id="file-name">Pilih Gambar...</span>
+                        <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                    </label>
+                </div>
+
+                <div class="control-group">
+                    <label>2. Pilih Model Generasi (Filter AI)</label>
+                    <select id="aiModel">
+                        <option value="cyberpunk">Cyberpunk Vision</option>
+                        <option value="sketch">Sketsa Pensil AI</option>
+                        <option value="pixelArt">Retro Pixel Art</option>
+                        <option value="neon">Neon Edges</option>
+                        <option value="vintage">Vintage Dream</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label>3. Intensitas Pengaruh (<span id="intensityVal">50</span>%)</label>
+                    <input type="range" id="intensity" min="0" max="100" value="50">
+                </div>
+
+                <button onclick="generateImage()" id="genBtn" style="margin-top: 10px;">Proses Generasi AI</button>
+                <button onclick="downloadImage()" id="downBtn" style="margin-top: 10px; background: #3b82f6; display: none;">Unduh Hasil</button>
+            </div>
+
+            <!-- Area Kanvas -->
+            <div class="canvas-area">
+                <div class="canvas-container">
+                    <h3>Gambar Asli</h3>
+                    <canvas id="originalCanvas" width="400" height="400"></canvas>
+                </div>
+                <div class="canvas-container">
+                    <h3>Hasil Generasi (Image to Image)</h3>
+                    <canvas id="outputCanvas" width="400" height="400"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay Loading -->
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <p style="margin-top: 20px; font-weight: bold; color: var(--primary);">Memproses Algoritma Lokal...</p>
+    </div>
+
     <script>
-        // Konfigurasi API yang disediakan oleh environment
-        const apiKey = ""; 
-
-        // Elemen DOM
-        const imageUpload = document.getElementById('image-upload');
-        const uploadPlaceholder = document.getElementById('upload-placeholder');
-        const imagePreview = document.getElementById('image-preview');
-        const promptInput = document.getElementById('prompt');
-        const generateBtn = document.getElementById('generate-btn');
-        const btnText = document.getElementById('btn-text');
-        const btnSpinner = document.getElementById('btn-spinner');
-        const resultSection = document.getElementById('result-section');
-        const resultImage = document.getElementById('result-image');
-        const downloadBtn = document.getElementById('download-btn');
-        const errorMessage = document.getElementById('error-message');
-
-        let currentBase64Image = null;
-        let currentMimeType = null;
-
-        // Handle Image Upload & Preview
-        imageUpload.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            currentMimeType = file.type;
-            const reader = new FileReader();
-            
-            reader.onload = function(event) {
-                const dataUrl = event.target.result;
-                imagePreview.src = dataUrl;
-                imagePreview.classList.remove('hidden');
-                uploadPlaceholder.classList.add('hidden');
-                
-                // Extract base64 part
-                currentBase64Image = dataUrl.split(',')[1];
-            };
-            
-            reader.readAsDataURL(file);
-            hideError();
-        });
-
-        // Tampilkan pesan error
-        function showError(msg) {
-            errorMessage.textContent = msg;
-            errorMessage.classList.remove('hidden');
-        }
-
-        // Sembunyikan pesan error
-        function hideError() {
-            errorMessage.classList.add('hidden');
-        }
-
-        // Set state tombol loading
-        function setLoading(isLoading) {
-            if (isLoading) {
-                generateBtn.disabled = true;
-                btnText.textContent = "Memproses...";
-                btnSpinner.classList.remove('hidden');
-                resultSection.classList.add('hidden');
-                hideError();
+        // --- LOGIC LOGIN LOKAL ---
+        function checkLogin() {
+            const input = document.getElementById('passcode').value;
+            const error = document.getElementById('login-error');
+            // Validasi string sesuai permintaan (case insensitive untuk kemudahan)
+            if (input.toLowerCase().includes('free ai by opangdarmawan')) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('app-screen').style.display = 'block';
             } else {
-                generateBtn.disabled = false;
-                btnText.textContent = "Hasilkan Gambar";
-                btnSpinner.classList.add('hidden');
+                error.style.display = 'block';
             }
         }
 
-        // Fetch dengan fungsi Exponential Backoff
-        async function fetchWithRetry(url, options, retries = 5) {
-            const delays = [1000, 2000, 4000, 8000, 16000];
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const response = await fetch(url, options);
-                    if (!response.ok) {
-                        throw new Error(`Gagal menghubungi server (Status: ${response.status})`);
+        // Memungkinkan login dengan tombol Enter
+        document.getElementById('passcode').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') checkLogin();
+        });
+
+        // --- VARIABEL KANVAS DAN GAMBAR ---
+        const imageInput = document.getElementById('imageInput');
+        const originalCanvas = document.getElementById('originalCanvas');
+        const outputCanvas = document.getElementById('outputCanvas');
+        const ctxOrig = originalCanvas.getContext('2d', { willReadFrequently: true });
+        const ctxOut = outputCanvas.getContext('2d', { willReadFrequently: true });
+        const intensitySlider = document.getElementById('intensity');
+        
+        let uploadedImg = new Image();
+        let isImageLoaded = false;
+
+        // --- UPDATE LABEL INTENSITAS ---
+        intensitySlider.addEventListener('input', function() {
+            document.getElementById('intensityVal').innerText = this.value;
+        });
+
+        // --- PROSES UPLOAD GAMBAR LOKAL ---
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('file-name').innerText = file.name;
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    uploadedImg.onload = function() {
+                        // Atur ukuran canvas secara proporsional, max lebar 800px untuk performa
+                        const maxWidth = 800;
+                        let w = uploadedImg.width;
+                        let h = uploadedImg.height;
+                        
+                        if (w > maxWidth) {
+                            h = (maxWidth / w) * h;
+                            w = maxWidth;
+                        }
+
+                        originalCanvas.width = w;
+                        originalCanvas.height = h;
+                        outputCanvas.width = w;
+                        outputCanvas.height = h;
+
+                        // Gambar ke canvas asli
+                        ctxOrig.clearRect(0, 0, w, h);
+                        ctxOrig.drawImage(uploadedImg, 0, 0, w, h);
+                        
+                        // Copy ke output sebagai default
+                        ctxOut.clearRect(0, 0, w, h);
+                        ctxOut.drawImage(uploadedImg, 0, 0, w, h);
+                        
+                        isImageLoaded = true;
+                        document.getElementById('downBtn').style.display = 'none';
                     }
-                    return await response.json();
-                } catch (error) {
-                    if (i === retries - 1) throw error;
-                    // Wait for the specified delay before retrying
-                    await new Promise(res => setTimeout(res, delays[i]));
+                    uploadedImg.src = event.target.result;
                 }
-            }
-        }
-
-        // Handle Generate Button Click
-        generateBtn.addEventListener('click', async () => {
-            const promptText = promptInput.value.trim();
-
-            if (!currentBase64Image) {
-                showError("Mohon unggah gambar awal terlebih dahulu.");
-                return;
-            }
-            if (!promptText) {
-                showError("Mohon masukkan deskripsi (prompt) perubahan.");
-                return;
-            }
-
-            setLoading(true);
-
-            // Endpoint Model Image-to-Image (gemini-2.5-flash-image-preview)
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
-            
-            const payload = {
-                contents: [
-                    {
-                        role: "user",
-                        parts: [
-                            { text: promptText },
-                            {
-                                inlineData: {
-                                    mimeType: currentMimeType,
-                                    data: currentBase64Image
-                                }
-                            }
-                        ]
-                    }
-                ],
-                generationConfig: {
-                    responseModalities: ["IMAGE"]
-                }
-            };
-
-            try {
-                const result = await fetchWithRetry(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                // Ekstrak hasil gambar dari respon JSON
-                const generatedBase64 = result.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
-                const generatedMimeType = result.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.mimeType || 'image/jpeg';
-
-                if (generatedBase64) {
-                    const imageSource = `data:${generatedMimeType};base64,${generatedBase64}`;
-                    resultImage.src = imageSource;
-                    downloadBtn.href = imageSource;
-                    resultSection.classList.remove('hidden');
-                    
-                    // Scroll ke hasil
-                    setTimeout(() => {
-                        resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                    }, 100);
-                } else {
-                    showError("AI tidak mengembalikan gambar. Coba gunakan prompt yang berbeda.");
-                }
-
-            } catch (error) {
-                console.error("Error generation:", error);
-                showError("Terjadi kesalahan saat menghasilkan gambar. Silakan coba beberapa saat lagi.");
-            } finally {
-                setLoading(false);
+                reader.readAsDataURL(file);
             }
         });
+
+        // --- ENGINE PEMROSESAN GAMBAR LOKAL (ALGORITMA AI) ---
+        function generateImage() {
+            if (!isImageLoaded) {
+                alert("Silakan unggah gambar dasar terlebih dahulu!");
+                return;
+            }
+
+            // Tampilkan loading simulasi (karena proses piksel bisa memakan waktu sedikit)
+            document.getElementById('loading-overlay').style.display = 'flex';
+
+            // Beri jeda kecil agar UI bisa render loading spinner sebelum javascript block main thread
+            setTimeout(() => {
+                applyLocalAlgorithmicFilter();
+                document.getElementById('loading-overlay').style.display = 'none';
+                document.getElementById('downBtn').style.display = 'block';
+            }, 500);
+        }
+
+        function applyLocalAlgorithmicFilter() {
+            const width = originalCanvas.width;
+            const height = originalCanvas.height;
+            const model = document.getElementById('aiModel').value;
+            const intensity = parseInt(document.getElementById('intensity').value) / 100; // 0.0 - 1.0
+
+            // Ambil data piksel gambar asli
+            const imageData = ctxOrig.getImageData(0, 0, width, height);
+            const data = imageData.data;
+            
+            // Buat array baru untuk output
+            const outImageData = ctxOut.createImageData(width, height);
+            const outData = outImageData.data;
+
+            // Salin data awal
+            for (let i = 0; i < data.length; i++) {
+                outData[i] = data[i];
+            }
+
+            // ALGORITMA: CYBERPUNK (Boost Merah & Biru, Turunkan Hijau, Kontras Tinggi)
+            if (model === 'cyberpunk') {
+                const contrast = 1.0 + (intensity * 1.5);
+                const intercept = 128 * (1 - contrast);
+                for (let i = 0; i < data.length; i += 4) {
+                    let r = data[i], g = data[i+1], b = data[i+2];
+                    
+                    r = (r * contrast + intercept) * (1 + intensity * 0.5);
+                    g = (g * contrast + intercept) * (1 - intensity * 0.4);
+                    b = (b * contrast + intercept) * (1 + intensity * 0.8);
+                    
+                    outData[i] = Math.min(255, Math.max(0, r));
+                    outData[i+1] = Math.min(255, Math.max(0, g));
+                    outData[i+2] = Math.min(255, Math.max(0, b));
+                }
+            }
+            // ALGORITMA: SKETSA PENSIL (Edge Detection Sederhana + Threshold)
+            else if (model === 'sketch') {
+                const thresholdVal = 50 + (intensity * 100);
+                for (let y = 0; y < height - 1; y++) {
+                    for (let x = 0; x < width - 1; x++) {
+                        const idx = (y * width + x) * 4;
+                        const idxRight = (y * width + (x + 1)) * 4;
+                        const idxBottom = ((y + 1) * width + x) * 4;
+
+                        // Grayscale
+                        const gray = (data[idx] + data[idx+1] + data[idx+2]) / 3;
+                        const grayRight = (data[idxRight] + data[idxRight+1] + data[idxRight+2]) / 3;
+                        const grayBottom = (data[idxBottom] + data[idxBottom+1] + data[idxBottom+2]) / 3;
+
+                        // Cari selisih antar piksel (Edge)
+                        const diff = Math.abs(gray - grayRight) + Math.abs(gray - grayBottom);
+                        
+                        // Hitam putih
+                        let finalColor = 255; // Putih
+                        if (diff > thresholdVal * (1.1 - intensity)) {
+                            finalColor = 0; // Hitam
+                        }
+
+                        // Blend dengan intensitas
+                        outData[idx] = outData[idx+1] = outData[idx+2] = 
+                            (finalColor * intensity) + (gray * (1 - intensity));
+                    }
+                }
+            }
+            // ALGORITMA: PIXEL ART (Downscale lalu Upscale tanpa smoothing)
+            else if (model === 'pixelArt') {
+                // Untuk efek ini kita gunakan API canvas langsung
+                const pixelSize = Math.floor(2 + (intensity * 18)); // Ukuran piksel 2 s/d 20
+                ctxOut.imageSmoothingEnabled = false;
+                
+                // Gambar kecil
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = width / pixelSize;
+                tempCanvas.height = height / pixelSize;
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.drawImage(originalCanvas, 0, 0, tempCanvas.width, tempCanvas.height);
+                
+                // Gambar membesar
+                ctxOut.clearRect(0,0,width,height);
+                ctxOut.drawImage(tempCanvas, 0, 0, tempCanvas.width, tempCanvas.height, 0, 0, width, height);
+                return; // Langsung return karena sudah dimodifikasi via canvas ctx
+            }
+            // ALGORITMA: NEON EDGES
+            else if (model === 'neon') {
+                for (let y = 0; y < height - 1; y++) {
+                    for (let x = 0; x < width - 1; x++) {
+                        const idx = (y * width + x) * 4;
+                        const idxRight = (y * width + (x + 1)) * 4;
+                        const idxBottom = ((y + 1) * width + x) * 4;
+
+                        const diffR = Math.abs(data[idx] - data[idxRight]) + Math.abs(data[idx] - data[idxBottom]);
+                        const diffG = Math.abs(data[idx+1] - data[idxRight+1]) + Math.abs(data[idx+1] - data[idxBottom+1]);
+                        const diffB = Math.abs(data[idx+2] - data[idxRight+2]) + Math.abs(data[idx+2] - data[idxBottom+2]);
+
+                        // Campur hasil tepi neon dengan gambar asli gelap
+                        outData[idx] = Math.min(255, (data[idx] * 0.2) + (diffR * intensity * 5)); // Merah neon
+                        outData[idx+1] = Math.min(255, (data[idx+1] * 0.2) + (diffG * intensity * 2)); // Hijau neon
+                        outData[idx+2] = Math.min(255, (data[idx+2] * 0.2) + (diffB * intensity * 5)); // Biru neon
+                    }
+                }
+            }
+            // ALGORITMA: VINTAGE DREAM (Sepia + Noise)
+            else if (model === 'vintage') {
+                for (let i = 0; i < data.length; i += 4) {
+                    const r = data[i], g = data[i+1], b = data[i+2];
+                    
+                    // Filter Sepia
+                    let tr = (r * 0.393) + (g * 0.769) + (b * 0.189);
+                    let tg = (r * 0.349) + (g * 0.686) + (b * 0.168);
+                    let tb = (r * 0.272) + (g * 0.534) + (b * 0.131);
+                    
+                    // Tambah noise
+                    const noise = (Math.random() - 0.5) * (intensity * 100);
+                    
+                    outData[i] = Math.min(255, (tr * intensity) + (r * (1-intensity)) + noise);
+                    outData[i+1] = Math.min(255, (tg * intensity) + (g * (1-intensity)) + noise);
+                    outData[i+2] = Math.min(255, (tb * intensity) + (b * (1-intensity)) + noise);
+                }
+            }
+
+            // Letakkan data piksel kembali ke kanvas output
+            ctxOut.putImageData(outImageData, 0, 0);
+        }
+
+        // --- FUNGSI UNDUH GAMBAR ---
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.download = 'Generasi_AI_OpangDarmawan.png';
+            link.href = outputCanvas.toDataURL('image/png');
+            link.click();
+        }
     </script>
 </body>
 </html>
