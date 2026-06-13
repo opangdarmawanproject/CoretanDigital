@@ -1,448 +1,310 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CORETAN DIGITAL by OpangDarmawan</title>
-    <!-- Tailwind CSS untuk Styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome untuk Icon -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f3f4f6;
-        }
-        /* Kustomisasi Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        
-        #drawingCanvas {
-            touch-action: none; /* Mencegah scrolling saat menggambar di HP */
-            background-color: white;
-            cursor: crosshair;
-        }
-        
-        .tool-btn.active {
-            background-color: #3b82f6;
-            color: white;
-            border-color: #3b82f6;
-        }
-
-        /* Perbaikan Visual Tombol Style */
-        .style-btn {
-            opacity: 0.6;
-            transition: all 0.3s ease;
-        }
-        .style-btn:hover {
-            opacity: 0.8;
-        }
-        .style-btn.active {
-            opacity: 1;
-            border: 2px solid #3b82f6;
-            background-color: #eff6ff;
-            transform: scale(1.05); /* Memperjelas pilihan */
-            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
-        }
-        
-        /* Loader Animation */
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3b82f6;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DIGITAL SCRIPT by OpangDarmawan</title>
+  <style>
+    :root {
+      --bg: #f8f9fa;
+      --panel: #ffffff;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --shadow: 0 4px 12px rgba(0,0,0,0.08);
+      --radius: 10px;
+    }
+    .digital-script-app {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background: var(--bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      box-sizing: border-box;
+    }
+    .app-header {
+      text-align: center;
+      margin-bottom: 16px;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 0.5px;
+    }
+    .app-header span { color: var(--accent); }
+    .canvas-wrapper {
+      position: relative;
+      background: #fff;
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: crosshair;
+      aspect-ratio: 4/3;
+      touch-action: none;
+    }
+    #sketchCanvas { display: block; width: 100%; height: 100%; }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 16px;
+      align-items: center;
+      justify-content: center;
+    }
+    .control-group { display: flex; flex-direction: column; gap: 4px; }
+    .control-label { font-size: 0.75rem; color: #64748b; font-weight: 500; }
+    select, button {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--panel);
+      color: var(--text);
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    select:hover, button:hover { border-color: var(--accent); }
+    button:active { transform: scale(0.98); }
+    #deleteBtn { border-color: var(--danger); color: var(--danger); }
+    #deleteBtn:hover { background: var(--danger); color: #fff; }
+    #repeatBtn { background: var(--accent); color: #fff; border: none; }
+    #repeatBtn:hover { background: var(--accent-hover); }
+    .status { text-align: center; margin-top: 10px; font-size: 0.8rem; color: #64748b; min-height: 1.2em; }
+    @media (max-width: 500px) {
+      .controls { flex-direction: column; }
+      .app-header { font-size: 1.25rem; }
+    }
+  </style>
 </head>
-<body class="min-h-screen text-gray-800 p-4 md:p-8">
-
-    <!-- Header -->
-    <header class="text-center mb-8">
-        <h1 class="text-3xl md:text-4xl font-bold text-gray-900 drop-shadow-sm">
-            <i class="fa-solid fa-palette text-blue-500 mr-2"></i>CORETAN DIGITAL
-        </h1>
-        <p class="text-gray-500 font-medium mt-1">by OpangDarmawan</p>
-    </header>
-
-    <!-- Main Container -->
-    <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
-        
-        <!-- Bagian Kiri: Area Menggambar -->
-        <div class="bg-white p-4 md:p-6 rounded-2xl shadow-lg border border-gray-100 flex flex-col">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-semibold"><i class="fa-solid fa-pen-nib mr-2"></i>Area Gambar</h2>
-                
-                <!-- Undo & Clear -->
-                <div class="flex space-x-2">
-                    <button id="btnUndo" class="p-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition" title="Ulang (Undo)">
-                        <i class="fa-solid fa-rotate-left pointer-events-none"></i> Ulang
-                    </button>
-                    <button id="btnClear" class="p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition" title="Hapus Semua">
-                        <i class="fa-solid fa-trash pointer-events-none"></i> Hapus
-                    </button>
-                </div>
-            </div>
-
-            <!-- Toolbar Alat -->
-            <div class="flex flex-wrap items-center gap-3 mb-4 p-3 bg-gray-50 rounded-xl border border-gray-200">
-                <button class="tool-btn active flex items-center px-4 py-2 border border-gray-300 rounded-lg transition hover:bg-gray-100" data-tool="pen">
-                    <i class="fa-solid fa-pen mr-2 pointer-events-none"></i> Pena
-                </button>
-                <button class="tool-btn flex items-center px-4 py-2 border border-gray-300 rounded-lg transition hover:bg-gray-100" data-tool="brush">
-                    <i class="fa-solid fa-paint-brush mr-2 pointer-events-none"></i> Kuas
-                </button>
-                <button class="tool-btn flex items-center px-4 py-2 border border-gray-300 rounded-lg transition hover:bg-gray-100" data-tool="eraser">
-                    <i class="fa-solid fa-eraser mr-2 pointer-events-none"></i> Penghapus
-                </button>
-                <div class="h-8 w-px bg-gray-300 mx-1"></div>
-                <div class="flex items-center space-x-2 bg-white px-3 py-1.5 border border-gray-300 rounded-lg">
-                    <label for="colorPicker" class="text-sm font-medium text-gray-600">Warna:</label>
-                    <input type="color" id="colorPicker" value="#000000" class="w-8 h-8 rounded cursor-pointer border-0 p-0">
-                </div>
-            </div>
-
-            <!-- Canvas Wrapper -->
-            <div class="relative w-full rounded-xl overflow-hidden border-2 border-dashed border-gray-300 bg-gray-50 flex-grow" style="min-height: 400px;">
-                <canvas id="drawingCanvas" class="absolute top-0 left-0 w-full h-full"></canvas>
-            </div>
-            <p class="text-xs text-gray-400 mt-2 text-center">* Coretan digunakan sebagai referensi visual Anda.</p>
-        </div>
-
-        <!-- Bagian Kanan: Generasi AI -->
-        <div class="bg-white p-4 md:p-6 rounded-2xl shadow-lg border border-gray-100 flex flex-col">
-            <h2 class="text-xl font-semibold mb-4"><i class="fa-solid fa-wand-magic-sparkles text-purple-500 mr-2"></i>Generate AI</h2>
-            
-            <!-- Sempurnakan Prompt -->
-            <div class="mb-5">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Deskripsikan Coretan Anda</label>
-                <textarea id="promptInput" rows="3" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition resize-none text-sm" placeholder="Contoh: Pemandangan gunung dengan matahari terbenam, ada sungai kecil dan pepohonan..."></textarea>
-            </div>
-
-            <!-- Pilihan Style -->
-            <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Style AI <span id="styleStatus" class="ml-2 text-blue-600 font-bold">(Realistic)</span></label>
-                <div class="grid grid-cols-3 gap-3">
-                    <button class="style-btn active flex flex-col items-center justify-center p-3 border border-gray-200 rounded-xl cursor-pointer" data-style="realistic">
-                        <img src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=100&h=100&fit=crop" class="w-12 h-12 rounded-full object-cover mb-2 border border-gray-200 pointer-events-none" alt="Realistic">
-                        <span class="text-xs font-semibold pointer-events-none">Realistic</span>
-                    </button>
-                    <button class="style-btn flex flex-col items-center justify-center p-3 border border-gray-200 rounded-xl cursor-pointer" data-style="sketch">
-                        <img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=100&h=100&fit=crop" class="w-12 h-12 rounded-full object-cover mb-2 border border-gray-200 pointer-events-none" alt="Sketch">
-                        <span class="text-xs font-semibold pointer-events-none">Sketch</span>
-                    </button>
-                    <button class="style-btn flex flex-col items-center justify-center p-3 border border-gray-200 rounded-xl cursor-pointer" data-style="animasi">
-                        <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=100&h=100&fit=crop" class="w-12 h-12 rounded-full object-cover mb-2 border border-gray-200 pointer-events-none" alt="Animasi">
-                        <span class="text-xs font-semibold pointer-events-none">Animasi</span>
-                    </button>
-                </div>
-            </div>
-
-            <button id="btnGenerate" class="w-full py-3.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold rounded-xl shadow-md transition transform hover:scale-[1.02] active:scale-95 flex justify-center items-center">
-                <i class="fa-solid fa-rocket mr-2 pointer-events-none"></i> Generate Mahakarya
-            </button>
-
-            <!-- Hasil Generate -->
-            <div class="mt-6 flex-grow flex flex-col">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Hasil Gambar</label>
-                <div id="resultContainer" class="flex-grow bg-gray-50 border-2 border-gray-200 rounded-xl flex items-center justify-center overflow-hidden relative" style="min-height: 300px;">
-                    <div id="loadingState" class="hidden flex-col items-center justify-center absolute inset-0 bg-white/80 z-10 backdrop-blur-sm">
-                        <div class="loader mb-3"></div>
-                        <p class="text-sm text-gray-600 font-medium animate-pulse">AI sedang melukis karya Anda...</p>
-                    </div>
-                    
-                    <p id="placeholderText" class="text-gray-400 text-sm text-center px-4">
-                        <i class="fa-regular fa-image text-3xl block mb-2"></i>
-                        Hasil akan muncul di sini
-                    </p>
-                    
-                    <img id="resultImage" src="" class="hidden w-full h-full object-contain" alt="Hasil AI">
-                </div>
-                <button id="btnDownload" class="hidden mt-3 w-full py-2.5 border-2 border-gray-300 hover:bg-gray-100 text-gray-700 font-semibold rounded-xl transition">
-                    <i class="fa-solid fa-download mr-2 pointer-events-none"></i> Download Hasil
-                </button>
-            </div>
-        </div>
+<body>
+  <div class="digital-script-app">
+    <div class="app-header">DIGITAL SCRIPT by <span>OpangDarmawan</span></div>
+    <div class="canvas-wrapper" id="canvasContainer">
+      <canvas id="sketchCanvas"></canvas>
     </div>
+    <div class="controls">
+      <div class="control-group">
+        <label class="control-label">Brush Pen</label>
+        <select id="brushType">
+          <option value="pencil">✏️ Pencil (Fine + Grain)</option>
+          <option value="pen">🖋️ Pen (Smooth + Consistent)</option>
+          <option value="charcoal">🌑 Charcoal (Soft + Textured)</option>
+          <option value="brush">🖌️ Brush (Variable Pressure)</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label class="control-label">Color</label>
+        <select id="colorType">
+          <option value="#111827">Black</option>
+          <option value="#4b5563">Dark Gray</option>
+          <option value="#2563eb">Ink Blue</option>
+          <option value="#dc2626">Crimson</option>
+          <option value="#78350f">Sepia</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label class="control-label">Actions</label>
+        <div style="display:flex; gap:8px;">
+          <button id="deleteBtn">🗑️ Delete</button>
+          <button id="repeatBtn">🔁 Repeat from Start</button>
+        </div>
+      </div>
+    </div>
+    <div class="status" id="status">Draw freely to generate realistic sketch animation</div>
+  </div>
 
-    <!-- Script Logika Aplikasi -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // ==========================================
-            // LOGIKA CANVAS (DRAWING)
-            // ==========================================
-            const canvas = document.getElementById('drawingCanvas');
-            const ctx = canvas.getContext('2d');
-            let isDrawing = false;
-            let currentTool = 'pen';
-            let currentColor = '#000000';
-            let undoStack = [];
-            
-            // Resize Canvas tanpa menghapus gambar
-            function resizeCanvas() {
-                const parent = canvas.parentElement;
-                
-                // Simpan gambar sementara sebelum resize
-                const tempCanvas = document.createElement('canvas');
-                tempCanvas.width = canvas.width || parent.clientWidth;
-                tempCanvas.height = canvas.height || parent.clientHeight;
-                const tempCtx = tempCanvas.getContext('2d');
-                if(canvas.width > 0) tempCtx.drawImage(canvas, 0, 0);
+  <script>
+    (function() {
+      'use strict';
+      const canvas = document.getElementById('sketchCanvas');
+      const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true });
+      const container = document.getElementById('canvasContainer');
+      const brushSelect = document.getElementById('brushType');
+      const colorSelect = document.getElementById('colorType');
+      const deleteBtn = document.getElementById('deleteBtn');
+      const repeatBtn = document.getElementById('repeatBtn');
+      const statusEl = document.getElementById('status');
 
-                canvas.width = parent.clientWidth;
-                canvas.height = parent.clientHeight;
-                
-                // Set background
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Kembalikan gambar
-                ctx.drawImage(tempCanvas, 0, 0);
-            }
-            
-            window.addEventListener('resize', resizeCanvas);
-            resizeCanvas();
-            saveState(); // Save state awal kosong
+      let isDrawing = false;
+      let points = [];
+      let strokeHistory = []; // {points, brush, color, timestamp}
+      let animationId = null;
+      let currentBrush = brushSelect.value;
+      let currentColor = colorSelect.value;
 
-            function saveState() {
-                undoStack.push(canvas.toDataURL());
-                if(undoStack.length > 20) undoStack.shift();
-            }
+      // Canvas setup
+      function resizeCanvas() {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = container.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+        canvas.style.width = `${rect.width}px`;
+        canvas.style.height = `${rect.height}px`;
+        redrawHistory();
+      }
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
 
-            function undo() {
-                if(undoStack.length > 1) {
-                    undoStack.pop(); 
-                    const imgData = undoStack[undoStack.length - 1];
-                    const img = new Image();
-                    img.src = imgData;
-                    img.onload = () => {
-                        ctx.clearRect(0, 0, canvas.width, canvas.height);
-                        ctx.drawImage(img, 0, 0);
-                    };
-                } else if(undoStack.length === 1) {
-                    clearCanvas(false);
-                }
-            }
+      // Brush engine
+      const brushPresets = {
+        pencil: { width: 1.2, lineCap: 'round', lineJoin: 'round', grain: 0.3, pressure: false },
+        pen:    { width: 1.8, lineCap: 'square', lineJoin: 'round', grain: 0, pressure: false },
+        charcoal: { width: 3.5, lineCap: 'round', lineJoin: 'round', grain: 0.6, pressure: true },
+        brush:  { width: 2.5, lineCap: 'round', lineJoin: 'round', grain: 0.1, pressure: true }
+      };
 
-            function clearCanvas(save = true) {
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                if(save) saveState();
-            }
+      // Drawing logic
+      function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+        const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+        return { x, y };
+      }
 
-            function getCoordinates(e) {
-                const rect = canvas.getBoundingClientRect();
-                let clientX = e.clientX;
-                let clientY = e.clientY;
+      function startDraw(e) {
+        if (animationId) cancelAnimationFrame(animationId);
+        isDrawing = true;
+        points = [];
+        const pos = getPos(e);
+        points.push(pos);
+        e.preventDefault();
+      }
 
-                if (e.touches && e.touches.length > 0) {
-                    clientX = e.touches[0].clientX;
-                    clientY = e.touches[0].clientY;
-                }
+      function draw(e) {
+        if (!isDrawing) return;
+        e.preventDefault();
+        const pos = getPos(e);
+        const prev = points[points.length - 1];
+        const velocity = Math.hypot(pos.x - prev.x, pos.y - prev.y);
+        
+        points.push({ x: pos.x, y: pos.y, velocity, timestamp: Date.now() });
+        renderStrokeSegment(prev, pos, velocity);
+      }
 
-                // Kalkulasi presisi kordinat mouse
-                return {
-                    x: (clientX - rect.left) * (canvas.width / rect.width),
-                    y: (clientY - rect.top) * (canvas.height / rect.height)
-                };
-            }
-
-            function startDrawing(e) {
-                e.preventDefault();
-                isDrawing = true;
-                const coords = getCoordinates(e);
-                ctx.beginPath();
-                ctx.moveTo(coords.x, coords.y);
-                draw(e);
-            }
-
-            function draw(e) {
-                if (!isDrawing) return;
-                e.preventDefault();
-                const coords = getCoordinates(e);
-                
-                ctx.lineCap = 'round';
-                ctx.lineJoin = 'round';
-                
-                if(currentTool === 'eraser') {
-                    ctx.strokeStyle = '#ffffff';
-                    ctx.lineWidth = 20;
-                    ctx.shadowBlur = 0;
-                } else if(currentTool === 'brush') {
-                    ctx.strokeStyle = currentColor;
-                    ctx.lineWidth = 15;
-                    ctx.shadowBlur = 8;
-                    ctx.shadowColor = currentColor;
-                } else {
-                    ctx.strokeStyle = currentColor;
-                    ctx.lineWidth = 3;
-                    ctx.shadowBlur = 0;
-                }
-
-                ctx.lineTo(coords.x, coords.y);
-                ctx.stroke();
-            }
-
-            function stopDrawing() {
-                if (isDrawing) {
-                    isDrawing = false;
-                    ctx.closePath();
-                    saveState();
-                }
-            }
-
-            canvas.addEventListener('mousedown', startDrawing);
-            canvas.addEventListener('mousemove', draw);
-            canvas.addEventListener('mouseup', stopDrawing);
-            canvas.addEventListener('mouseout', stopDrawing);
-            canvas.addEventListener('touchstart', startDrawing, {passive: false});
-            canvas.addEventListener('touchmove', draw, {passive: false});
-            canvas.addEventListener('touchend', stopDrawing);
-
-            // ==========================================
-            // LOGIKA UI (TOOLBAR & AI GENERATOR)
-            // ==========================================
-            const toolBtns = document.querySelectorAll('.tool-btn');
-            toolBtns.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const targetBtn = e.currentTarget;
-                    toolBtns.forEach(b => b.classList.remove('active'));
-                    targetBtn.classList.add('active');
-                    currentTool = targetBtn.dataset.tool;
-                });
-            });
-
-            document.getElementById('colorPicker').addEventListener('input', (e) => {
-                currentColor = e.target.value;
-                if(currentTool === 'eraser') document.querySelector('[data-tool="pen"]').click();
-            });
-
-            document.getElementById('btnUndo').addEventListener('click', undo);
-            document.getElementById('btnClear').addEventListener('click', () => clearCanvas(true));
-
-            // Perbaikan Logika Pemilihan Style
-            let currentStyle = 'realistic';
-            const styleBtns = document.querySelectorAll('.style-btn');
-            const styleStatus = document.getElementById('styleStatus');
-
-            styleBtns.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const targetBtn = e.currentTarget;
-                    styleBtns.forEach(b => b.classList.remove('active'));
-                    targetBtn.classList.add('active');
-                    currentStyle = targetBtn.dataset.style;
-                    
-                    // Update teks indikator gaya
-                    styleStatus.textContent = `(${currentStyle.charAt(0).toUpperCase() + currentStyle.slice(1)})`;
-                });
-            });
-
-            // ==========================================
-            // LOGIKA AI GENERATION (FIXED & AKURAT)
-            // ==========================================
-            const btnGenerate = document.getElementById('btnGenerate');
-            const promptInput = document.getElementById('promptInput');
-            const resultImage = document.getElementById('resultImage');
-            const placeholderText = document.getElementById('placeholderText');
-            const loadingState = document.getElementById('loadingState');
-            const btnDownload = document.getElementById('btnDownload');
-
-            btnGenerate.addEventListener('click', () => {
-                const userPrompt = promptInput.value.trim();
-                
-                if(!userPrompt) {
-                    alert('Mohon deskripsikan gambar/coretan Anda di kolom prompt terlebih dahulu!');
-                    promptInput.focus();
-                    return;
-                }
-
-                // Ubah teks tombol sesuai gaya yang dipilih
-                const originalBtnText = btnGenerate.innerHTML;
-                btnGenerate.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Memproses ${currentStyle.toUpperCase()}...`;
-                btnGenerate.disabled = true;
-
-                // FORMULA PROMPT: Memaksa AI mengikuti gaya dengan meletakkan kata kunci di awal kalimat
-                let finalPrompt = "";
-                if(currentStyle === 'realistic') {
-                    finalPrompt = `A highly detailed photorealistic image of ${userPrompt}. 8k resolution, masterpiece, realistic texture, cinematic lighting, real life photography, sharp focus.`;
-                } else if (currentStyle === 'sketch') {
-                    finalPrompt = `A rough pencil sketch drawing of ${userPrompt}. Black and white, hand drawn, graphite pencil on paper, artistic, monochrome line art, unfinished outline.`;
-                } else if (currentStyle === 'animasi') {
-                    finalPrompt = `An anime style 2D illustration of ${userPrompt}. Studio Ghibli style, vibrant colors, flat shading, beautiful anime masterpiece, Japanese animation art.`;
-                }
-
-                // UI Loading
-                placeholderText.classList.add('hidden');
-                resultImage.classList.add('hidden');
-                btnDownload.classList.add('hidden');
-                loadingState.classList.remove('hidden');
-                loadingState.classList.add('flex');
-
-                const randomSeed = Math.floor(Math.random() * 9999999);
-                
-                // KUNCI PERBAIKAN: enhance=false agar Pollinations AI tidak merusak/menimpa gaya 'Sketch'/'Animasi' kita
-                const encodedPrompt = encodeURIComponent(finalPrompt);
-                const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=768&height=768&nologo=true&seed=${randomSeed}&enhance=false`;
-
-                const imgLoader = new Image();
-                imgLoader.src = imageUrl;
-                
-                imgLoader.onload = () => {
-                    loadingState.classList.add('hidden');
-                    loadingState.classList.remove('flex');
-                    btnGenerate.innerHTML = originalBtnText;
-                    btnGenerate.disabled = false;
-
-                    resultImage.src = imageUrl;
-                    resultImage.classList.remove('hidden');
-                    btnDownload.classList.remove('hidden');
-                };
-                
-                imgLoader.onerror = () => {
-                    loadingState.classList.add('hidden');
-                    loadingState.classList.remove('flex');
-                    btnGenerate.innerHTML = originalBtnText;
-                    btnGenerate.disabled = false;
-
-                    placeholderText.classList.remove('hidden');
-                    placeholderText.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-red-500 text-3xl block mb-2"></i> Gagal! Server sibuk, silakan klik Generate lagi.';
-                }
-            });
-
-            btnDownload.addEventListener('click', async () => {
-                const url = resultImage.src;
-                if(!url) return;
-                try {
-                    const response = await fetch(url);
-                    const blob = await response.blob();
-                    const blobUrl = URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.href = blobUrl;
-                    link.download = `Coretan-${currentStyle}-${new Date().getTime()}.jpg`;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(blobUrl);
-                } catch(e) {
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.download = 'Coretan.jpg';
-                    link.target = '_blank';
-                    link.click();
-                }
-            });
-
+      function endDraw() {
+        if (!isDrawing || points.length < 2) return;
+        isDrawing = false;
+        strokeHistory.push({
+          points: [...points],
+          brush: currentBrush,
+          color: currentColor,
+          completed: Date.now()
         });
-    </script>
+        statusEl.textContent = `✅ Sketch captured. ${strokeHistory.length} strokes saved.`;
+      }
+
+      function renderStrokeSegment(p1, p2, velocity) {
+        const preset = brushPresets[currentBrush];
+        ctx.strokeStyle = currentColor;
+        ctx.lineCap = preset.lineCap;
+        ctx.lineJoin = preset.lineJoin;
+        ctx.lineWidth = preset.pressure ? Math.max(1, preset.width * (1 - velocity * 0.05)) : preset.width;
+        ctx.globalAlpha = 0.9;
+
+        // Procedural grain simulation
+        if (preset.grain > 0) {
+          const segments = Math.max(1, Math.floor(preset.width * 2));
+          for (let i = 0; i < segments; i++) {
+            ctx.beginPath();
+            const offset = (Math.random() - 0.5) * preset.grain * 3;
+            ctx.moveTo(p1.x + offset, p1.y + offset);
+            ctx.quadraticCurveTo(
+              (p1.x + p2.x) / 2 + offset,
+              (p1.y + p2.y) / 2 + offset,
+              p2.x + offset, p2.y + offset
+            );
+            ctx.stroke();
+          }
+        } else {
+          ctx.beginPath();
+          ctx.moveTo(p1.x, p1.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+      }
+
+      function redrawHistory() {
+        ctx.clearRect(0, 0, canvas.width / (window.devicePixelRatio || 1), canvas.height / (window.devicePixelRatio || 1));
+        strokeHistory.forEach(stroke => {
+          for (let i = 1; i < stroke.points.length; i++) {
+            renderStrokeSegment(stroke.points[i-1], stroke.points[i], stroke.points[i].velocity || 1);
+          }
+        });
+      }
+
+      // Animation replay
+      function replayAnimation() {
+        if (strokeHistory.length === 0) {
+          statusEl.textContent = "Nothing to replay. Draw something first.";
+          return;
+        }
+        statusEl.textContent = "🔁 Replaying sketch animation from start...";
+        ctx.clearRect(0, 0, canvas.width / (window.devicePixelRatio || 1), canvas.height / (window.devicePixelRatio || 1));
+        
+        let strokeIndex = 0;
+        let pointIndex = 0;
+        const totalPoints = strokeHistory.reduce((sum, s) => sum + s.points.length, 0);
+        let renderedPoints = 0;
+
+        function step() {
+          if (strokeIndex >= strokeHistory.length) {
+            statusEl.textContent = "✅ Animation complete.";
+            return;
+          }
+          const stroke = strokeHistory[strokeIndex];
+          const preset = brushPresets[stroke.brush];
+          currentBrush = stroke.brush;
+          currentColor = stroke.color;
+          
+          ctx.strokeStyle = currentColor;
+          ctx.lineCap = preset.lineCap;
+          ctx.lineJoin = preset.lineJoin;
+          
+          if (pointIndex < stroke.points.length - 1) {
+            const p1 = stroke.points[pointIndex];
+            const p2 = stroke.points[pointIndex + 1];
+            const vel = p2.velocity || 1;
+            renderStrokeSegment(p1, p2, vel);
+            pointIndex++;
+            renderedPoints++;
+          } else {
+            strokeIndex++;
+            pointIndex = 0;
+          }
+          animationId = requestAnimationFrame(step);
+        }
+        animationId = requestAnimationFrame(step);
+      }
+
+      // Event Listeners
+      canvas.addEventListener('mousedown', startDraw);
+      canvas.addEventListener('mousemove', draw);
+      canvas.addEventListener('mouseup', endDraw);
+      canvas.addEventListener('mouseleave', endDraw);
+      
+      canvas.addEventListener('touchstart', startDraw, { passive: false });
+      canvas.addEventListener('touchmove', draw, { passive: false });
+      canvas.addEventListener('touchend', endDraw);
+
+      brushSelect.addEventListener('change', (e) => { currentBrush = e.target.value; });
+      colorSelect.addEventListener('change', (e) => { currentColor = e.target.value; });
+
+      deleteBtn.addEventListener('click', () => {
+        if (animationId) cancelAnimationFrame(animationId);
+        strokeHistory = [];
+        points = [];
+        ctx.clearRect(0, 0, canvas.width / (window.devicePixelRatio || 1), canvas.height / (window.devicePixelRatio || 1));
+        statusEl.textContent = "🗑️ Canvas cleared. Start fresh.";
+      });
+
+      repeatBtn.addEventListener('click', replayAnimation);
+    })();
+  </script>
 </body>
 </html>
