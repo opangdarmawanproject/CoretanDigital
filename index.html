@@ -4,439 +4,501 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CORETAN DIGITAL by OpangDarmawan</title>
-    <!-- Menggunakan Tailwind CSS untuk styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
         }
-        canvas {
-            touch-action: none; /* Mencegah scrolling layar saat menggambar di HP */
-            box-shadow: inset 0 0 0 1px #e5e7eb;
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
         }
-        .tool-active {
-            background-color: #3b82f6;
+        
+        header {
+            background: linear-gradient(90deg, #6b46c1, #9f7aea);
+            padding: 20px 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+        
+        .main {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 25px;
+        }
+        
+        .toolbar {
+            background: rgba(0,0,0,0.4);
+            border-radius: 15px;
+            padding: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .tool-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        label {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+        
+        input[type="color"] {
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        
+        input[type="range"] {
+            accent-color: #9f7aea;
+        }
+        
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            background: #6b46c1;
             color: white;
-            border-color: #3b82f6;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3b82f6;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
+        
+        button:hover {
+            background: #9f7aea;
+            transform: translateY(-2px);
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        
+        button.danger {
+            background: #e53e3e;
+        }
+        
+        button.danger:hover {
+            background: #fc8181;
+        }
+        
+        .canvas-container {
+            position: relative;
+            background: #ffffff;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        
+        canvas {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            touch-action: none;
+            background: white;
+        }
+        
+        .styles {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+        }
+        
+        .style-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .style-card:hover {
+            transform: scale(1.05);
+            background: rgba(159, 122, 234, 0.3);
+        }
+        
+        .style-card.active {
+            border: 3px solid #9f7aea;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 15px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: #2d2d44;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            text-align: center;
         }
     </style>
 </head>
-<body class="min-h-screen text-gray-800 p-4 md:p-8">
-
-    <div class="max-w-6xl mx-auto">
-        <!-- Header -->
-        <header class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">
-                Coretan <span class="text-blue-600">Digital</span>
-            </h1>
-            <p class="text-sm md:text-base text-gray-500 mt-2 font-medium">by OpangDarmawan</p>
+<body>
+    <div class="container">
+        <header>
+            <h1>CORETAN DIGITAL</h1>
+            <p class="subtitle">by OpangDarmawan • Unlimited &amp; Private</p>
         </header>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            
-            <!-- Kolom Kiri: Area Menggambar -->
-            <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-semibold">Area Kanvas</h2>
-                    <button id="btnClear" class="text-sm flex items-center gap-1 text-red-500 hover:text-red-700 hover:bg-red-50 px-3 py-1.5 rounded-lg transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-                        Ulang hingga awal
-                    </button>
+        
+        <div class="main">
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <div class="tool-group">
+                    <label>Warna</label>
+                    <input type="color" id="colorPicker" value="#000000">
                 </div>
-
-                <!-- Toolbar Alat -->
-                <div class="flex flex-wrap gap-3 mb-4 items-center p-3 bg-gray-50 rounded-xl">
-                    <div class="flex items-center gap-2">
-                        <label for="colorPicker" class="text-sm font-medium text-gray-600">Warna:</label>
-                        <input type="color" id="colorPicker" value="#000000" class="w-8 h-8 rounded cursor-pointer border-0 p-0 bg-transparent">
-                    </div>
-                    
-                    <div class="h-6 w-px bg-gray-300 mx-2 hidden sm:block"></div>
-
-                    <div class="flex gap-2 w-full sm:w-auto">
-                        <button id="btnPen" class="tool-btn tool-active flex-1 sm:flex-none flex items-center justify-center gap-2 border border-gray-300 px-4 py-2 rounded-lg text-sm font-medium transition" onclick="setTool('pen')">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
-                            Pena
-                        </button>
-                        <button id="btnBrush" class="tool-btn flex-1 sm:flex-none flex items-center justify-center gap-2 border border-gray-300 px-4 py-2 rounded-lg text-sm font-medium transition hover:bg-gray-100" onclick="setTool('brush')">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9.06 11.9 8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"/><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z"/></svg>
-                            Kuas
-                        </button>
-                        <button id="btnEraser" class="tool-btn flex-1 sm:flex-none flex items-center justify-center gap-2 border border-gray-300 px-4 py-2 rounded-lg text-sm font-medium transition hover:bg-gray-100" onclick="setTool('eraser')">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg>
-                            Hapus
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Kanvas -->
-                <div class="flex-grow w-full bg-gray-50 rounded-xl overflow-hidden relative" style="min-height: 400px;">
-                    <canvas id="drawingCanvas" class="absolute top-0 left-0 w-full h-full cursor-crosshair bg-white"></canvas>
-                </div>
-            </div>
-
-            <!-- Kolom Kanan: Kontrol AI & Hasil -->
-            <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col">
-                <h2 class="text-lg font-semibold mb-4 text-blue-600">Ubah Coretan dengan AI</h2>
                 
-                <div class="space-y-4 mb-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Gaya (Style):</label>
-                        <select id="styleSelect" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white">
-                            <option value="realistic">Realistis (Photorealistic)</option>
-                            <option value="anime">Animasi / Anime Jepang</option>
-                            <option value="sketch">Sketsa Pensil Profesional</option>
-                            <option value="3d">Animasi 3D Pixar Style</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Keterangan Tambahan (Opsional):</label>
-                        <textarea id="promptInput" rows="2" placeholder="Contoh: Seekor kucing lucu memakai kacamata hitam di pantai..." class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"></textarea>
-                        <p class="text-xs text-gray-500 mt-1">*AI akan menyempurnakan prompt ini secara otomatis.</p>
-                    </div>
-
-                    <button id="btnGenerate" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl shadow-md transition transform active:scale-[0.98] flex items-center justify-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/></svg>
-                        Generate Hasil
-                    </button>
+                <div class="tool-group">
+                    <label>Ukuran Pena</label>
+                    <input type="range" id="brushSize" min="1" max="50" value="5">
+                    <span id="sizeValue">5px</span>
                 </div>
-
-                <!-- Area Hasil -->
-                <div class="flex-grow flex flex-col">
-                    <h3 class="text-sm font-semibold text-gray-700 mb-2">Hasil:</h3>
-                    <div id="resultContainer" class="flex-grow bg-gray-50 border border-gray-200 rounded-xl flex items-center justify-center relative overflow-hidden min-h-[300px]">
-                        
-                        <!-- State Kosong -->
-                        <div id="emptyState" class="text-center p-6 text-gray-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-3 opacity-50"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
-                            <p class="text-sm">Gambar hasil akan muncul di sini</p>
-                        </div>
-
-                        <!-- State Loading -->
-                        <div id="loadingState" class="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center hidden z-10">
-                            <div class="loader mb-4"></div>
-                            <p class="text-sm font-medium text-blue-600 animate-pulse">AI sedang melukis...</p>
-                        </div>
-
-                        <!-- State Error -->
-                        <div id="errorState" class="absolute inset-0 bg-red-50 flex flex-col items-center justify-center hidden p-6 text-center z-10">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-500 mb-2"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
-                            <p id="errorMsg" class="text-sm text-red-600 font-medium"></p>
-                        </div>
-
-                        <!-- Hasil Gambar -->
-                        <img id="resultImage" class="absolute w-full h-full object-contain hidden" src="" alt="Hasil Generate AI">
+                
+                <div class="tool-group">
+                    <label>Jenis Alat</label>
+                    <select id="toolSelect">
+                        <option value="pen">✏️ Pena Halus</option>
+                        <option value="brush">🖌️ Kuas Tebal</option>
+                        <option value="marker">🖍️ Marker</option>
+                    </select>
+                </div>
+                
+                <button onclick="undo()">
+                    ↩️ Undo
+                </button>
+                
+                <button onclick="clearCanvas()" class="danger">
+                    🗑️ Hapus Semua
+                </button>
+                
+                <button onclick="saveDrawing()">
+                    💾 Simpan Gambar
+                </button>
+            </div>
+            
+            <!-- Canvas -->
+            <div class="canvas-container">
+                <canvas id="drawingCanvas" width="900" height="600"></canvas>
+            </div>
+            
+            <!-- Style Options -->
+            <div>
+                <h3 style="margin-bottom: 15px; color: #ddd;">🔄 Ubah Gaya Coretan</h3>
+                <div class="styles">
+                    <div class="style-card" onclick="applyStyle('original')">
+                        <strong>Original</strong>
+                        <p>Coretan Asli</p>
                     </div>
-                    
-                    <button id="btnDownload" class="mt-4 w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 rounded-lg transition hidden flex items-center justify-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                        Download Gambar
-                    </button>
+                    <div class="style-card" onclick="applyStyle('sketch')">
+                        <strong>Realistic Sketch</strong>
+                        <p>Pensil Realistis</p>
+                    </div>
+                    <div class="style-card" onclick="applyStyle('ink')">
+                        <strong>Ink Drawing</strong>
+                        <p>Tinta Hitam Putih</p>
+                    </div>
+                    <div class="style-card" onclick="applyStyle('watercolor')">
+                        <strong>Watercolor</strong>
+                        <p>Cat Air Lembut</p>
+                    </div>
+                    <div class="style-card" onclick="applyStyle('animation')">
+                        <strong>Animasi Sederhana</strong>
+                        <p>Coretan Bergerak</p>
+                    </div>
                 </div>
             </div>
-
+        </div>
+        
+        <div class="footer">
+            CORETAN DIGITAL by OpangDarmawan • 100% Client-side • Aman &amp; Private • Bebas dipakai di manapun
         </div>
     </div>
 
-    <!-- Script Logika Aplikasi -->
-    <script>
-        // API Key (Dibiarkan kosong sesuai instruksi keamanan, akan diisi oleh runtime Canvas atau Anda isi manual jika host di luar)
-        const apiKey = ""; 
+    <!-- Modal for animation -->
+    <div id="animModal" class="modal">
+        <div class="modal-content">
+            <h2>Animasi Sedang Diputar...</h2>
+            <p>Coretan kamu sedang dianimasikan</p>
+            <button onclick="stopAnimation()" style="background:#e53e3e;">Stop</button>
+        </div>
+    </div>
 
-        // --- KONFIGURASI KANVAS MENGGAMBAR ---
+    <script>
         const canvas = document.getElementById('drawingCanvas');
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        
+        const ctx = canvas.getContext('2d');
         let isDrawing = false;
         let lastX = 0;
         let lastY = 0;
-        let currentTool = 'pen'; // 'pen', 'brush', 'eraser'
-        let currentColor = '#000000';
-
-        // Menyesuaikan ukuran kanvas dengan containernya
-        function resizeCanvas() {
-            const container = canvas.parentElement;
-            // Simpan gambar yang ada sebelum resize
-            const tempCanvas = document.createElement('canvas');
-            const tempCtx = tempCanvas.getContext('2d');
-            tempCanvas.width = canvas.width;
-            tempCanvas.height = canvas.height;
-            if(canvas.width > 0) tempCtx.drawImage(canvas, 0, 0);
-
-            // Set ukuran baru sesuai layar
-            canvas.width = container.clientWidth;
-            canvas.height = container.clientHeight;
-
-            // Isi dengan background putih murni (penting agar hasil render AI jelas)
-            ctx.fillStyle = "white";
+        let history = [];
+        let currentStyle = 'original';
+        let animationFrame = null;
+        
+        // Set initial canvas background
+        function initCanvas() {
+            ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Kembalikan coretan yang tadi
-            if(tempCanvas.width > 0) ctx.drawImage(tempCanvas, 0, 0);
-            
-            updateBrushSettings();
+            saveHistory();
         }
-
-        // Inisialisasi awal
-        window.addEventListener('load', resizeCanvas);
-        window.addEventListener('resize', resizeCanvas);
-
-        // Update pengaturan kuas/pena
-        function updateBrushSettings() {
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
-            
-            if (currentTool === 'pen') {
-                ctx.strokeStyle = currentColor;
-                ctx.lineWidth = 3;
-                ctx.shadowBlur = 0;
-            } else if (currentTool === 'brush') {
-                ctx.strokeStyle = currentColor;
-                ctx.lineWidth = 15;
-                ctx.shadowBlur = 5;
-                ctx.shadowColor = currentColor;
-            } else if (currentTool === 'eraser') {
-                ctx.strokeStyle = 'white'; // Penghapus = menimpa dengan warna putih
-                ctx.lineWidth = 25;
-                ctx.shadowBlur = 0;
+        
+        // Save current state to history
+        function saveHistory() {
+            history.push(canvas.toDataURL());
+            if (history.length > 30) history.shift(); // limit memory
+        }
+        
+        function undo() {
+            if (history.length <= 1) return;
+            history.pop(); // remove current
+            const previous = history[history.length - 1];
+            const img = new Image();
+            img.onload = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0);
+            };
+            img.src = previous;
+        }
+        
+        function clearCanvas() {
+            if (confirm('Hapus semua coretan?')) {
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                history = [];
+                saveHistory();
             }
         }
-
-        // Event Listener Warna & Alat
-        document.getElementById('colorPicker').addEventListener('input', (e) => {
-            currentColor = e.target.value;
-            if (currentTool !== 'eraser') updateBrushSettings();
-        });
-
-        function setTool(toolName) {
-            currentTool = toolName;
-            
-            // Update UI Button
-            document.querySelectorAll('.tool-btn').forEach(btn => {
-                btn.classList.remove('tool-active', 'bg-blue-600', 'text-white', 'border-blue-600');
-                btn.classList.add('hover:bg-gray-100');
-            });
-            
-            const activeBtn = document.getElementById(
-                toolName === 'pen' ? 'btnPen' : 
-                toolName === 'brush' ? 'btnBrush' : 'btnEraser'
-            );
-            
-            activeBtn.classList.remove('hover:bg-gray-100');
-            activeBtn.classList.add('tool-active');
-            
-            updateBrushSettings();
-        }
-
-        // Fungsi Menggambar (Mouse)
-        function startDrawing(e) {
-            isDrawing = true;
-            [lastX, lastY] = [e.offsetX, e.offsetY];
-            // Mulai path baru agar titik-titik tunggal bisa tergambar
-            ctx.beginPath();
-            ctx.moveTo(lastX, lastY);
-            ctx.lineTo(lastX, lastY);
-            ctx.stroke();
-        }
-
+        
+        // Drawing logic
         function draw(e) {
             if (!isDrawing) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX || e.touches[0].clientX - rect.left;
+            const y = e.clientY || e.touches[0].clientY - rect.top;
+            
+            const tool = document.getElementById('toolSelect').value;
+            const color = document.getElementById('colorPicker').value;
+            const size = parseInt(document.getElementById('brushSize').value);
+            
+            ctx.strokeStyle = color;
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+            ctx.lineWidth = size;
+            
+            if (tool === 'brush') {
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = color;
+            } else if (tool === 'marker') {
+                ctx.globalAlpha = 0.6;
+            } else {
+                ctx.shadowBlur = 0;
+                ctx.globalAlpha = 1;
+            }
+            
             ctx.beginPath();
             ctx.moveTo(lastX, lastY);
-            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.lineTo(x, y);
             ctx.stroke();
-            [lastX, lastY] = [e.offsetX, e.offsetY];
+            
+            lastX = x;
+            lastY = y;
         }
-
-        function stopDrawing() {
-            isDrawing = false;
+        
+        // Event listeners
+        function startDrawing(e) {
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            lastX = e.clientX || e.touches[0].clientX - rect.left;
+            lastY = e.clientY || e.touches[0].clientY - rect.top;
         }
-
+        
+        function endDrawing() {
+            if (isDrawing) {
+                isDrawing = false;
+                saveHistory();
+                ctx.shadowBlur = 0;
+                ctx.globalAlpha = 1;
+            }
+        }
+        
+        // Mouse & Touch
         canvas.addEventListener('mousedown', startDrawing);
         canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('mouseup', stopDrawing);
-        canvas.addEventListener('mouseout', stopDrawing);
-
-        // Fungsi Menggambar (Touch / HP)
-        function getTouchPos(e) {
-            const rect = canvas.getBoundingClientRect();
-            return {
-                x: e.touches[0].clientX - rect.left,
-                y: e.touches[0].clientY - rect.top
-            };
-        }
-
+        canvas.addEventListener('mouseup', endDrawing);
+        canvas.addEventListener('mouseout', endDrawing);
+        
         canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault(); // Mencegah scrolling layarnya
-            const pos = getTouchPos(e);
-            isDrawing = true;
-            [lastX, lastY] = [pos.x, pos.y];
-            ctx.beginPath();
-            ctx.moveTo(lastX, lastY);
-            ctx.lineTo(lastX, lastY);
-            ctx.stroke();
+            e.preventDefault();
+            startDrawing(e);
         });
-
         canvas.addEventListener('touchmove', (e) => {
             e.preventDefault();
-            if (!isDrawing) return;
-            const pos = getTouchPos(e);
-            ctx.beginPath();
-            ctx.moveTo(lastX, lastY);
-            ctx.lineTo(pos.x, pos.y);
-            ctx.stroke();
-            [lastX, lastY] = [pos.x, pos.y];
+            draw(e);
         });
-
-        canvas.addEventListener('touchend', stopDrawing);
-
-        // Fitur Clear/Ulang
-        document.getElementById('btnClear').addEventListener('click', () => {
-            ctx.fillStyle = "white";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            endDrawing();
         });
-
-
-        // --- LOGIKA AI GENERASI GAMBAR ---
-        const btnGenerate = document.getElementById('btnGenerate');
-        const emptyState = document.getElementById('emptyState');
-        const loadingState = document.getElementById('loadingState');
-        const errorState = document.getElementById('errorState');
-        const errorMsg = document.getElementById('errorMsg');
-        const resultImage = document.getElementById('resultImage');
-        const btnDownload = document.getElementById('btnDownload');
-
-        // Fungsi Delay untuk retry
-        const delay = ms => new Promise(res => setTimeout(res, ms));
-
-        // Eksekusi API
-        async function fetchImageWithRetry(payload, maxRetries = 5) {
-            const delays = [1000, 2000, 4000, 8000, 16000];
-            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
-
-            for (let i = 0; i < maxRetries; i++) {
-                try {
-                    const response = await fetch(endpoint, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-
-                    const result = await response.json();
-                    
-                    // Ekstrak base64 dari response Gemini Image-to-Image
-                    const parts = result.candidates?.[0]?.content?.parts;
-                    if (!parts) throw new Error("Gagal mengambil data dari AI.");
-                    
-                    const imagePart = parts.find(p => p.inlineData);
-                    if (imagePart && imagePart.inlineData.data) {
-                        return imagePart.inlineData.data;
-                    } else {
-                        throw new Error("AI tidak mengembalikan format gambar yang valid.");
-                    }
-
-                } catch (error) {
-                    if (i === maxRetries - 1) throw error;
-                    await delay(delays[i]); // Exponential backoff
+        
+        // Brush size display
+        const sizeSlider = document.getElementById('brushSize');
+        const sizeValue = document.getElementById('sizeValue');
+        sizeSlider.addEventListener('input', () => {
+            sizeValue.textContent = sizeSlider.value + 'px';
+        });
+        
+        // Save drawing
+        function saveDrawing() {
+            const link = document.createElement('a');
+            link.download = 'coretan-digital-opangdarmawan.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+        
+        // Style applications (client-side filters)
+        function applyStyle(style) {
+            currentStyle = style;
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            
+            if (style === 'sketch') {
+                // Simple pencil sketch effect
+                for (let i = 0; i < data.length; i += 4) {
+                    const gray = data[i] * 0.3 + data[i+1] * 0.59 + data[i+2] * 0.11;
+                    data[i] = gray;
+                    data[i+1] = gray;
+                    data[i+2] = gray;
+                }
+                ctx.putImageData(imageData, 0, 0);
+            } 
+            else if (style === 'ink') {
+                // High contrast black & white
+                for (let i = 0; i < data.length; i += 4) {
+                    const avg = (data[i] + data[i+1] + data[i+2]) / 3;
+                    const val = avg > 128 ? 255 : 0;
+                    data[i] = val;
+                    data[i+1] = val;
+                    data[i+2] = val;
+                }
+                ctx.putImageData(imageData, 0, 0);
+            } 
+            else if (style === 'watercolor') {
+                ctx.filter = 'blur(2px) saturate(1.5)';
+                ctx.drawImage(canvas, 0, 0);
+                ctx.filter = 'none';
+            } 
+            else if (style === 'animation') {
+                startAnimation();
+            } 
+            else {
+                // Original - reload last history
+                if (history.length > 0) {
+                    const img = new Image();
+                    img.onload = () => {
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        ctx.drawImage(img, 0, 0);
+                    };
+                    img.src = history[history.length - 1];
                 }
             }
         }
-
-        btnGenerate.addEventListener('click', async () => {
-            // Setup UI states
-            emptyState.classList.add('hidden');
-            errorState.classList.add('hidden');
-            resultImage.classList.add('hidden');
-            btnDownload.classList.add('hidden');
-            loadingState.classList.remove('hidden');
-            btnGenerate.disabled = true;
-            btnGenerate.classList.add('opacity-70', 'cursor-not-allowed');
-
-            try {
-                // Ambil gambar dari kanvas
-                const base64Data = canvas.toDataURL("image/png").split(',')[1];
+        
+        // Simple animation (wiggle effect)
+        let animOffset = 0;
+        function startAnimation() {
+            const modal = document.getElementById('animModal');
+            modal.style.display = 'flex';
+            
+            let baseImage = canvas.toDataURL();
+            
+            function animate() {
+                animOffset = Math.sin(Date.now() / 200) * 3;
                 
-                // Siapkan Konteks & Penyempurnaan Prompt
-                const style = document.getElementById('styleSelect').value;
-                const userPrompt = document.getElementById('promptInput').value.trim();
-                
-                let styleInstruction = "";
-                switch(style) {
-                    case 'realistic':
-                        styleInstruction = "Make it a stunning, highly detailed photorealistic image. Professional photography, sharp focus, 8k resolution, cinematic lighting.";
-                        break;
-                    case 'anime':
-                        styleInstruction = "Transform this into a high-quality vibrant Anime style illustration. Studio Ghibli or Makoto Shinkai aesthetic, beautiful colors, clear lines, detailed anime art.";
-                        break;
-                    case 'sketch':
-                        styleInstruction = "Turn this into a master-level pencil sketch art. Detailed cross-hatching, realistic shading, professional artistic drawing, monochromatic graphite.";
-                        break;
-                    case '3d':
-                        styleInstruction = "Transform this into a 3D Pixar/Disney style animated render. Smooth soft lighting, vibrant colors, expressive features, octane render quality.";
-                        break;
-                }
-
-                // AI akan menggunakan gambar dasar (coretan) + Instruksi kita
-                const finalPrompt = `I have provided a simple sketch/drawing. Please generate a complete image based on this sketch. \nStyle strictly: ${styleInstruction}\nAdditional subject details: ${userPrompt || 'Enhance whatever is drawn into a beautiful masterpiece'}. Keep the core structure of the sketch.`;
-
-                const payload = {
-                    contents: [{
-                        parts: [
-                            { text: finalPrompt },
-                            { inlineData: { mimeType: "image/png", data: base64Data } }
-                        ]
-                    }],
-                    generationConfig: {
-                        responseModalities: ["TEXT", "IMAGE"]
-                    }
+                const img = new Image();
+                img.onload = () => {
+                    ctx.save();
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.translate(animOffset, Math.sin(Date.now() / 300) * 2);
+                    ctx.drawImage(img, 0, 0);
+                    ctx.restore();
                 };
-
-                // Panggil API
-                const generatedBase64 = await fetchImageWithRetry(payload);
-
-                // Tampilkan hasil
-                resultImage.src = `data:image/png;base64,${generatedBase64}`;
-                resultImage.classList.remove('hidden');
-                btnDownload.classList.remove('hidden');
-
-            } catch (err) {
-                console.error(err);
-                errorMsg.innerText = "Gagal memproses gambar. " + (apiKey === "" ? "Pastikan API Key sudah terisi jika berjalan secara lokal." : "Silakan coba lagi nanti.");
-                errorState.classList.remove('hidden');
-            } finally {
-                loadingState.classList.add('hidden');
-                btnGenerate.disabled = false;
-                btnGenerate.classList.remove('opacity-70', 'cursor-not-allowed');
+                img.src = baseImage;
+                
+                animationFrame = requestAnimationFrame(animate);
             }
-        });
-
-        // Fitur Download Gambar
-        btnDownload.addEventListener('click', () => {
-            const link = document.createElement('a');
-            link.download = `CoretanDigital_${Date.now()}.png`;
-            link.href = resultImage.src;
-            link.click();
-        });
-
+            
+            animate();
+        }
+        
+        function stopAnimation() {
+            const modal = document.getElementById('animModal');
+            modal.style.display = 'none';
+            if (animationFrame) cancelAnimationFrame(animationFrame);
+            applyStyle('original');
+        }
+        
+        // Initialize
+        window.onload = () => {
+            initCanvas();
+            
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'z' && e.ctrlKey) {
+                    undo();
+                }
+                if (e.key === 'Delete') {
+                    clearCanvas();
+                }
+            });
+        };
     </script>
 </body>
 </html>
