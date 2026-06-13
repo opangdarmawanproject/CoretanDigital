@@ -1,415 +1,397 @@
-<div id="digital-script-app">
-  <style>
-    /* Scoped CSS to prevent conflicts with any website builder theme */
-    #digital-script-app {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      max-width: 800px;
-      margin: 20px auto;
-      padding: 24px;
-      background: #ffffff;
-      border-radius: 16px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-      color: #2d3748;
-      border: 1px solid #e2e8f0;
-    }
-    #digital-script-app .ds-header {
-      text-align: center;
-      margin-bottom: 20px;
-      border-bottom: 2px solid #edf2f7;
-      padding-bottom: 15px;
-    }
-    #digital-script-app .ds-header h2 {
-      margin: 0;
-      color: #1a202c;
-      font-size: 1.6rem;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-    }
-    #digital-script-app .ds-header span {
-      display: block;
-      font-size: 0.85rem;
-      color: #718096;
-      margin-top: 5px;
-      font-weight: 500;
-    }
-    #digital-script-app .ds-toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      margin-bottom: 20px;
-      justify-content: center;
-      align-items: flex-end;
-    }
-    #digital-script-app .ds-group {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-    }
-    #digital-script-app .ds-group label {
-      font-size: 0.8rem;
-      font-weight: 600;
-      margin-bottom: 6px;
-      color: #4a5568;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    #digital-script-app select {
-      padding: 10px 14px;
-      border: 1px solid #cbd5e0;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      background: #f7fafc;
-      color: #2d3748;
-      cursor: pointer;
-      transition: border-color 0.2s;
-      outline: none;
-    }
-    #digital-script-app select:focus {
-      border-color: #4299e1;
-      box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
-    }
-    #digital-script-app .ds-canvas-container {
-      background: #ffffff;
-      border: 2px dashed #cbd5e0;
-      border-radius: 12px;
-      overflow: hidden;
-      position: relative;
-      cursor: crosshair;
-      touch-action: none; /* Prevents page scrolling while drawing on mobile */
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-    }
-    #digital-script-app canvas {
-      display: block;
-      width: 100%;
-      height: 400px;
-    }
-    #digital-script-app .ds-actions {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      margin-top: 20px;
-      flex-wrap: wrap;
-    }
-    #digital-script-app .ds-btn {
-      padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    #digital-script-app .ds-btn:active {
-      transform: scale(0.97);
-    }
-    #digital-script-app .ds-btn-undo {
-      background: #edf2f7;
-      color: #4a5568;
-    }
-    #digital-script-app .ds-btn-undo:hover {
-      background: #e2e8f0;
-    }
-    #digital-script-app .ds-btn-delete {
-      background: #fed7d7;
-      color: #c53030;
-    }
-    #digital-script-app .ds-btn-delete:hover {
-      background: #feb2b2;
-    }
-    #digital-script-app .ds-btn-generate {
-      background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
-      color: white;
-      box-shadow: 0 4px 6px rgba(66, 153, 225, 0.3);
-    }
-    #digital-script-app .ds-btn-generate:hover {
-      box-shadow: 0 6px 12px rgba(66, 153, 225, 0.4);
-      transform: translateY(-1px);
-    }
-    #digital-script-app .ds-footer {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 0.8rem;
-      color: #a0aec0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-    #digital-script-app .ds-footer svg {
-      width: 14px;
-      height: 14px;
-      fill: #48bb78;
-    }
-
-    /* Realistic Sketch Animation Keyframes */
-    @keyframes ds-sketch-reveal {
-      0% { filter: blur(8px) opacity(0); transform: scale(0.98); }
-      40% { filter: blur(4px) opacity(0.6); }
-      100% { filter: blur(0px) opacity(1); transform: scale(1); }
-    }
-    .ds-animating {
-      animation: ds-sketch-reveal 1.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    }
-  </style>
-
-  <div class="ds-header">
-    <h2>DIGITAL SCRIPT</h2>
-    <span>by OpangDarmawan</span>
-  </div>
-  
-  <div class="ds-toolbar">
-    <div class="ds-group">
-      <label>Brush Pen</label>
-      <select id="ds-brush">
-        <option value="pencil">Fine Pencil</option>
-        <option value="pen" selected>Standard Pen</option>
-        <option value="marker">Thick Marker</option>
-      </select>
-    </div>
-    
-    <div class="ds-group">
-      <label>Ink Color</label>
-      <select id="ds-color">
-        <option value="#1a202c">Midnight Black</option>
-        <option value="#2b6cb0">Royal Blue</option>
-        <option value="#c53030">Crimson Red</option>
-        <option value="#2f855a">Forest Green</option>
-        <option value="#6b46c1">Deep Purple</option>
-      </select>
-    </div>
-    
-    <div class="ds-group">
-      <label>Sketch Style</label>
-      <select id="ds-style">
-        <option value="none">Original Scribble</option>
-        <option value="pencil_sketch">Realistic Pencil Sketch</option>
-        <option value="ink_brush">Bold Ink Brush</option>
-        <option value="charcoal">Soft Charcoal</option>
-      </select>
-    </div>
-  </div>
-
-  <div class="ds-canvas-container" id="ds-canvas-container">
-    <canvas id="ds-canvas"></canvas>
-  </div>
-
-  <div class="ds-actions">
-    <button id="ds-undo" class="ds-btn ds-btn-undo" title="Repeat steps backward until the beginning">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
-      Undo (Repeat)
-    </button>
-    <button id="ds-clear" class="ds-btn ds-btn-delete" title="Delete all and start over">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-      Delete (Clear)
-    </button>
-    <button id="ds-generate" class="ds-btn ds-btn-generate" title="Apply AI-like sketch animation filter">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-      Generate Sketch Animation
-    </button>
-  </div>
-  
-  <div class="ds-footer">
-    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-    100% Client-Side Processing • No API Key Required • Unlimited & Secure
-  </div>
-
-  <script>
-    (function() {
-      const canvas = document.getElementById('ds-canvas');
-      const ctx = canvas.getContext('2d', { willReadFrequently: true });
-      const container = document.getElementById('ds-canvas-container');
-      
-      let history = [];
-      let historyStep = -1;
-      let isDrawing = false;
-      let lastX = 0;
-      let lastY = 0;
-
-      // Initialize Canvas Resolution
-      function initCanvas() {
-        const rect = container.getBoundingClientRect();
-        canvas.width = rect.width;
-        canvas.height = 400;
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        saveState();
-      }
-      
-      // Delay init slightly to ensure container is fully rendered in website builders
-      setTimeout(initCanvas, 150);
-
-      function saveState() {
-        historyStep++;
-        if (historyStep < history.length) {
-          history.length = historyStep; // Truncate redo history if we draw after undoing
-        }
-        history.push(canvas.toDataURL());
-        // Limit history to 20 steps to prevent browser memory bloat
-        if (history.length > 20) {
-          history.shift();
-          historyStep--;
-        }
-      }
-
-      function undo() {
-        if (historyStep > 0) {
-          historyStep--;
-          const img = new Image();
-          img.src = history[historyStep];
-          img.onload = () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 0, 0);
-          };
-        }
-      }
-
-      function clearCanvas() {
-        if(confirm('Are you sure you want to delete everything and start over?')) {
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-          saveState();
-        }
-      }
-
-      function getBrushSettings() {
-        const brush = document.getElementById('ds-brush').value;
-        const color = document.getElementById('ds-color').value;
-        
-        ctx.strokeStyle = color;
-        
-        if (brush === 'pencil') {
-          ctx.lineWidth = 2;
-          ctx.globalAlpha = 0.85;
-          ctx.shadowBlur = 0;
-        } else if (brush === 'pen') {
-          ctx.lineWidth = 4;
-          ctx.globalAlpha = 1.0;
-          ctx.shadowBlur = 0;
-        } else if (brush === 'marker') {
-          ctx.lineWidth = 14;
-          ctx.globalAlpha = 0.6;
-          ctx.shadowBlur = 3;
-          ctx.shadowColor = color;
-        }
-      }
-
-      function getCoordinates(e) {
-        const rect = canvas.getBoundingClientRect();
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        return {
-          x: clientX - rect.left,
-          y: clientY - rect.top
-        };
-      }
-
-      function startDrawing(e) {
-        isDrawing = true;
-        const coords = getCoordinates(e);
-        lastX = coords.x;
-        lastY = coords.y;
-        getBrushSettings();
-      }
-
-      function draw(e) {
-        if (!isDrawing) return;
-        e.preventDefault(); // Critical: prevents scrolling on mobile while drawing
-        const coords = getCoordinates(e);
-        
-        ctx.beginPath();
-        ctx.moveTo(lastX, lastY);
-        ctx.lineTo(coords.x, coords.y);
-        ctx.stroke();
-        
-        lastX = coords.x;
-        lastY = coords.y;
-      }
-
-      function stopDrawing() {
-        if (isDrawing) {
-          isDrawing = false;
-          ctx.beginPath(); // Reset path to prevent connecting separate lines
-          saveState();
-        }
-      }
-
-      // Mouse Events
-      canvas.addEventListener('mousedown', startDrawing);
-      canvas.addEventListener('mousemove', draw);
-      canvas.addEventListener('mouseup', stopDrawing);
-      canvas.addEventListener('mouseout', stopDrawing);
-      
-      // Touch Events (Mobile Support)
-      canvas.addEventListener('touchstart', startDrawing, { passive: false });
-      canvas.addEventListener('touchmove', draw, { passive: false });
-      canvas.addEventListener('touchend', stopDrawing);
-
-      // Button Actions
-      document.getElementById('ds-undo').addEventListener('click', undo);
-      document.getElementById('ds-clear').addEventListener('click', clearCanvas);
-      
-      document.getElementById('ds-generate').addEventListener('click', () => {
-        const style = document.getElementById('ds-style').value;
-        if (style === 'none') return;
-        
-        saveState(); // Save before transformation
-        
-        const w = canvas.width;
-        const h = canvas.height;
-        const off = document.createElement('canvas');
-        off.width = w;
-        off.height = h;
-        const offCtx = off.getContext('2d');
-        
-        // Algorithmic "AI" Sketch Generation (No API Required)
-        if (style === 'pencil_sketch') {
-          // Step 1: Base Grayscale
-          offCtx.filter = 'grayscale(100%)';
-          offCtx.drawImage(canvas, 0, 0);
-          
-          // Step 2: Inverted + Blurred layer with Color-Dodge blend mode
-          offCtx.globalCompositeOperation = 'color-dodge';
-          offCtx.filter = 'grayscale(100%) invert(100%) blur(5px)';
-          offCtx.drawImage(canvas, 0, 0);
-          
-          ctx.clearRect(0, 0, w, h);
-          ctx.drawImage(off, 0, 0);
-          
-        } else if (style === 'ink_brush') {
-          // High contrast threshold simulation
-          offCtx.filter = 'grayscale(100%) contrast(250%) brightness(130%)';
-          offCtx.drawImage(canvas, 0, 0);
-          ctx.clearRect(0, 0, w, h);
-          ctx.drawImage(off, 0, 0);
-          
-        } else if (style === 'charcoal') {
-          // Softened, textured look
-          offCtx.filter = 'grayscale(100%) contrast(160%) blur(1.5px)';
-          offCtx.drawImage(canvas, 0, 0);
-          ctx.clearRect(0, 0, w, h);
-          ctx.globalCompositeOperation = 'multiply';
-          ctx.drawImage(off, 0, 0);
-          ctx.globalCompositeOperation = 'source-over';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FREE Ai by OpangDarmawan - Image to Image</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* slate-900 */
+            color: #f8fafc; /* slate-50 */
         }
         
-        // Reset context states
-        ctx.filter = 'none';
-        offCtx.filter = 'none';
-        offCtx.globalCompositeOperation = 'source-over';
-        
-        // Trigger CSS Animation
-        canvas.classList.remove('ds-animating');
-        void canvas.offsetWidth; // Force reflow to restart animation
-        canvas.classList.add('ds-animating');
-        
-        saveState(); // Save the generated state
-      });
+        /* Custom scrollbar for text area */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
 
-    })();
-  </script>
-</div>
+        .loader {
+            border: 3px solid #1e293b;
+            border-bottom-color: #3b82f6;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .drop-active {
+            border-color: #3b82f6 !important;
+            background-color: rgba(59, 130, 246, 0.1) !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center justify-center">
+
+    <!-- Header -->
+    <header class="w-full max-w-5xl mb-8 text-center space-y-2">
+        <div class="inline-flex items-center justify-center space-x-2 bg-slate-800/50 border border-slate-700 px-4 py-1.5 rounded-full mb-2">
+            <i data-lucide="sparkles" class="w-4 h-4 text-blue-400"></i>
+            <span class="text-sm font-medium text-blue-200">100% Unlimited Generation</span>
+        </div>
+        <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 text-transparent bg-clip-text">
+            FREE Ai by OpangDarmawan
+        </h1>
+        <p class="text-slate-400 text-sm md:text-base max-w-2xl mx-auto">
+            Transform your images with AI. Upload a source image, describe what you want, and let the magic happen. Safe, fast, and entirely free.
+        </p>
+    </header>
+
+    <!-- Main App Container -->
+    <main class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-6 bg-slate-800/40 p-4 md:p-6 rounded-3xl border border-slate-700/50 shadow-2xl backdrop-blur-sm">
+        
+        <!-- Left Column: Input -->
+        <section class="flex flex-col space-y-6">
+            
+            <!-- Image Upload Area -->
+            <div class="space-y-2">
+                <label class="text-sm font-semibold text-slate-300 ml-1">Source Image</label>
+                <div id="dropzone" class="relative group border-2 border-dashed border-slate-600 bg-slate-800/80 rounded-2xl h-64 flex flex-col items-center justify-center text-center cursor-pointer transition-all hover:border-blue-500 hover:bg-slate-800 overflow-hidden" onclick="document.getElementById('fileInput').click()">
+                    
+                    <input type="file" id="fileInput" class="hidden" accept="image/png, image/jpeg, image/webp">
+                    
+                    <!-- Placeholder UI -->
+                    <div id="uploadPlaceholder" class="flex flex-col items-center space-y-3 p-6 pointer-events-none">
+                        <div class="p-4 bg-slate-700 rounded-full group-hover:scale-110 transition-transform">
+                            <i data-lucide="image-plus" class="w-8 h-8 text-blue-400"></i>
+                        </div>
+                        <div>
+                            <p class="text-base font-medium text-slate-200">Click to upload or drag & drop</p>
+                            <p class="text-xs text-slate-400 mt-1">PNG, JPG, or WEBP (Max 5MB)</p>
+                        </div>
+                    </div>
+
+                    <!-- Image Preview UI (Hidden initially) -->
+                    <div id="previewContainer" class="absolute inset-0 hidden w-full h-full bg-slate-900">
+                        <img id="previewImage" class="w-full h-full object-contain" src="" alt="Preview">
+                        <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span class="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium border border-slate-600 shadow-lg flex items-center space-x-2">
+                                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                                <span>Change Image</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prompt Input Area -->
+            <div class="space-y-2 flex-grow flex flex-col">
+                <label for="promptInput" class="text-sm font-semibold text-slate-300 ml-1">What do you want to change?</label>
+                <textarea id="promptInput" class="w-full flex-grow min-h-[120px] bg-slate-800 border border-slate-600 rounded-2xl p-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none transition-all" placeholder="E.g., Turn this into a beautiful watercolor painting, add a futuristic cyberpunk city background, or make it look like a vintage photo..."></textarea>
+            </div>
+
+            <!-- Generate Button -->
+            <button id="generateBtn" onclick="generateImage()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-6 rounded-2xl shadow-lg shadow-blue-500/20 transition-all active:scale-[0.98] flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                <i data-lucide="wand-2" id="btnIcon" class="w-5 h-5"></i>
+                <span id="btnText">Generate Image</span>
+                <span id="btnLoader" class="loader w-5 h-5 hidden"></span>
+            </button>
+            
+            <!-- Error Message Box -->
+            <div id="errorMessage" class="hidden bg-red-500/10 border border-red-500/50 text-red-400 p-4 rounded-xl text-sm flex items-start space-x-3">
+                <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
+                <span id="errorText">An error occurred.</span>
+            </div>
+
+        </section>
+
+        <!-- Right Column: Output -->
+        <section class="flex flex-col space-y-2 h-full">
+            <label class="text-sm font-semibold text-slate-300 ml-1">Result</label>
+            <div class="flex-grow border border-slate-700 bg-slate-900 rounded-2xl relative overflow-hidden flex flex-col items-center justify-center min-h-[400px]">
+                
+                <!-- Empty State -->
+                <div id="resultPlaceholder" class="text-center p-6 flex flex-col items-center text-slate-500">
+                    <i data-lucide="sparkles" class="w-12 h-12 mb-4 opacity-50"></i>
+                    <p>Your generated masterpiece will appear here.</p>
+                </div>
+
+                <!-- Loading State -->
+                <div id="resultLoading" class="hidden absolute inset-0 bg-slate-900/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
+                    <span class="loader w-12 h-12 border-4 mb-4"></span>
+                    <p class="text-blue-400 font-medium animate-pulse">Ai is painting...</p>
+                </div>
+
+                <!-- Result Image -->
+                <img id="resultImage" class="hidden w-full h-full object-contain" src="" alt="Generated Result">
+
+                <!-- Download Button Overlay -->
+                <button id="downloadBtn" onclick="downloadImage()" class="hidden absolute bottom-4 right-4 bg-slate-800/90 hover:bg-slate-700 text-white p-3 rounded-full shadow-xl border border-slate-600 transition-all hover:scale-110 active:scale-95 group" title="Download Image">
+                    <i data-lucide="download" class="w-5 h-5 group-hover:text-blue-400 transition-colors"></i>
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-12 text-slate-500 text-sm flex items-center space-x-2">
+        <span>Protected and built for GitHub Pages</span>
+        <i data-lucide="shield-check" class="w-4 h-4 text-emerald-500"></i>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Environment Configuration
+        // The API Key is intentionally left blank here. The runtime environment or hosting server
+        // injects or provides the proxy for this request, making it safe for public repositories.
+        const apiKey = ""; 
+        const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=" + apiKey;
+
+        // State variables
+        let uploadedImageBase64 = "";
+        let uploadedImageMimeType = "";
+        let isGenerating = false;
+
+        // DOM Elements
+        const fileInput = document.getElementById('fileInput');
+        const dropzone = document.getElementById('dropzone');
+        const previewContainer = document.getElementById('previewContainer');
+        const previewImage = document.getElementById('previewImage');
+        const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+        const promptInput = document.getElementById('promptInput');
+        const generateBtn = document.getElementById('generateBtn');
+        const btnIcon = document.getElementById('btnIcon');
+        const btnText = document.getElementById('btnText');
+        const btnLoader = document.getElementById('btnLoader');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+        const resultPlaceholder = document.getElementById('resultPlaceholder');
+        const resultLoading = document.getElementById('resultLoading');
+        const resultImage = document.getElementById('resultImage');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        // Event Listeners for Drag & Drop
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('drop-active');
+        });
+
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('drop-active');
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('drop-active');
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        // File handling logic
+        function handleFile(file) {
+            // Check if file is an image
+            if (!file.type.startsWith('image/')) {
+                showError("Please upload a valid image file (PNG, JPG, WEBP).");
+                return;
+            }
+
+            // Check size (5MB max)
+            if (file.size > 5 * 1024 * 1024) {
+                showError("Image file size must be less than 5MB.");
+                return;
+            }
+
+            hideError();
+            const reader = new FileReader();
+            
+            reader.onload = (e) => {
+                const dataUrl = e.target.result;
+                const matches = dataUrl.match(/^data:(image\/[a-zA-Z+]+);base64,(.+)$/);
+                
+                if (matches) {
+                    uploadedImageMimeType = matches[1];
+                    uploadedImageBase64 = matches[2];
+                    
+                    // Update UI
+                    previewImage.src = dataUrl;
+                    uploadPlaceholder.classList.add('hidden');
+                    previewContainer.classList.remove('hidden');
+                }
+            };
+            
+            reader.readAsDataURL(file);
+        }
+
+        // Exponential backoff fetch
+        async function fetchWithRetry(url, options, maxRetries = 5) {
+            let retries = 0;
+            const delays = [1000, 2000, 4000, 8000, 16000];
+            
+            while (retries < maxRetries) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(`API Error ${response.status}: ${errorData.error?.message || 'Failed to generate image'}`);
+                    }
+                    return await response.json();
+                } catch (error) {
+                    retries++;
+                    console.warn(`Attempt ${retries} failed. Retrying...`);
+                    if (retries >= maxRetries) {
+                        throw error;
+                    }
+                    await new Promise(resolve => setTimeout(resolve, delays[retries - 1]));
+                }
+            }
+        }
+
+        // Main generation logic
+        async function generateImage() {
+            if (isGenerating) return;
+            
+            const prompt = promptInput.value.trim();
+
+            // Validations
+            if (!uploadedImageBase64) {
+                showError("Please upload a source image first.");
+                return;
+            }
+            if (!prompt) {
+                showError("Please enter a description of what you want to change.");
+                promptInput.focus();
+                return;
+            }
+
+            // Set Loading UI
+            setLoadingState(true);
+            hideError();
+
+            const payload = {
+                contents: [
+                    {
+                        role: "user",
+                        parts: [
+                            { text: prompt },
+                            {
+                                inlineData: {
+                                    mimeType: uploadedImageMimeType,
+                                    data: uploadedImageBase64
+                                }
+                            }
+                        ]
+                    }
+                ],
+                generationConfig: {
+                    responseModalities: ["IMAGE"]
+                }
+            };
+
+            try {
+                const data = await fetchWithRetry(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                // Extract base64 image from response
+                const generatedBase64 = data.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+
+                if (generatedBase64) {
+                    const resultMimeType = data.candidates[0].content.parts.find(p => p.inlineData).inlineData.mimeType || 'image/jpeg';
+                    const resultDataUrl = `data:${resultMimeType};base64,${generatedBase64}`;
+                    
+                    // Display Result
+                    resultImage.src = resultDataUrl;
+                    resultImage.classList.remove('hidden');
+                    resultPlaceholder.classList.add('hidden');
+                    downloadBtn.classList.remove('hidden');
+                    downloadBtn.classList.add('flex');
+                } else {
+                    throw new Error("No image data received from the AI model.");
+                }
+
+            } catch (error) {
+                showError(error.message || "Failed to generate image. Please try again.");
+            } finally {
+                setLoadingState(false);
+            }
+        }
+
+        function downloadImage() {
+            if (!resultImage.src) return;
+            
+            const a = document.createElement('a');
+            a.href = resultImage.src;
+            a.download = `opangdarmawan-ai-${Date.now()}.jpg`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // UI Helpers
+        function setLoadingState(isLoading) {
+            isGenerating = isLoading;
+            generateBtn.disabled = isLoading;
+            
+            if (isLoading) {
+                btnIcon.classList.add('hidden');
+                btnText.textContent = "Generating...";
+                btnLoader.classList.remove('hidden');
+                resultLoading.classList.remove('hidden');
+                resultImage.classList.add('hidden');
+                downloadBtn.classList.add('hidden');
+                downloadBtn.classList.remove('flex');
+            } else {
+                btnIcon.classList.remove('hidden');
+                btnText.textContent = "Generate Image";
+                btnLoader.classList.add('hidden');
+                resultLoading.classList.add('hidden');
+            }
+        }
+
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.classList.remove('hidden');
+            errorMessage.classList.add('flex');
+        }
+
+        function hideError() {
+            errorMessage.classList.add('hidden');
+            errorMessage.classList.remove('flex');
+        }
+
+    </script>
+</body>
+</html>
