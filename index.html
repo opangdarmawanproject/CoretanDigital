@@ -1,310 +1,415 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DIGITAL SCRIPT by OpangDarmawan</title>
+<div id="digital-script-app">
   <style>
-    :root {
-      --bg: #f8f9fa;
-      --panel: #ffffff;
-      --border: #e2e8f0;
-      --text: #1e293b;
-      --accent: #2563eb;
-      --accent-hover: #1d4ed8;
-      --danger: #ef4444;
-      --danger-hover: #dc2626;
-      --shadow: 0 4px 12px rgba(0,0,0,0.08);
-      --radius: 10px;
-    }
-    .digital-script-app {
-      font-family: system-ui, -apple-system, sans-serif;
+    /* Scoped CSS to prevent conflicts with any website builder theme */
+    #digital-script-app {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
       max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-      background: var(--bg);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      box-sizing: border-box;
+      margin: 20px auto;
+      padding: 24px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+      color: #2d3748;
+      border: 1px solid #e2e8f0;
     }
-    .app-header {
+    #digital-script-app .ds-header {
       text-align: center;
-      margin-bottom: 16px;
-      font-size: 1.5rem;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #edf2f7;
+      padding-bottom: 15px;
+    }
+    #digital-script-app .ds-header h2 {
+      margin: 0;
+      color: #1a202c;
+      font-size: 1.6rem;
       font-weight: 700;
-      color: var(--text);
-      letter-spacing: 0.5px;
+      letter-spacing: -0.5px;
     }
-    .app-header span { color: var(--accent); }
-    .canvas-wrapper {
-      position: relative;
-      background: #fff;
-      border: 2px dashed var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      cursor: crosshair;
-      aspect-ratio: 4/3;
-      touch-action: none;
+    #digital-script-app .ds-header span {
+      display: block;
+      font-size: 0.85rem;
+      color: #718096;
+      margin-top: 5px;
+      font-weight: 500;
     }
-    #sketchCanvas { display: block; width: 100%; height: 100%; }
-    .controls {
+    #digital-script-app .ds-toolbar {
       display: flex;
       flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 20px;
+      justify-content: center;
+      align-items: flex-end;
+    }
+    #digital-script-app .ds-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    #digital-script-app .ds-group label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #4a5568;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    #digital-script-app select {
+      padding: 10px 14px;
+      border: 1px solid #cbd5e0;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background: #f7fafc;
+      color: #2d3748;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    #digital-script-app select:focus {
+      border-color: #4299e1;
+      box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+    }
+    #digital-script-app .ds-canvas-container {
+      background: #ffffff;
+      border: 2px dashed #cbd5e0;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      cursor: crosshair;
+      touch-action: none; /* Prevents page scrolling while drawing on mobile */
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    }
+    #digital-script-app canvas {
+      display: block;
+      width: 100%;
+      height: 400px;
+    }
+    #digital-script-app .ds-actions {
+      display: flex;
       gap: 12px;
-      margin-top: 16px;
+      justify-content: center;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    #digital-script-app .ds-btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    #digital-script-app .ds-btn:active {
+      transform: scale(0.97);
+    }
+    #digital-script-app .ds-btn-undo {
+      background: #edf2f7;
+      color: #4a5568;
+    }
+    #digital-script-app .ds-btn-undo:hover {
+      background: #e2e8f0;
+    }
+    #digital-script-app .ds-btn-delete {
+      background: #fed7d7;
+      color: #c53030;
+    }
+    #digital-script-app .ds-btn-delete:hover {
+      background: #feb2b2;
+    }
+    #digital-script-app .ds-btn-generate {
+      background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+      color: white;
+      box-shadow: 0 4px 6px rgba(66, 153, 225, 0.3);
+    }
+    #digital-script-app .ds-btn-generate:hover {
+      box-shadow: 0 6px 12px rgba(66, 153, 225, 0.4);
+      transform: translateY(-1px);
+    }
+    #digital-script-app .ds-footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.8rem;
+      color: #a0aec0;
+      display: flex;
       align-items: center;
       justify-content: center;
+      gap: 6px;
     }
-    .control-group { display: flex; flex-direction: column; gap: 4px; }
-    .control-label { font-size: 0.75rem; color: #64748b; font-weight: 500; }
-    select, button {
-      padding: 8px 12px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      background: var(--panel);
-      color: var(--text);
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: all 0.2s;
+    #digital-script-app .ds-footer svg {
+      width: 14px;
+      height: 14px;
+      fill: #48bb78;
     }
-    select:hover, button:hover { border-color: var(--accent); }
-    button:active { transform: scale(0.98); }
-    #deleteBtn { border-color: var(--danger); color: var(--danger); }
-    #deleteBtn:hover { background: var(--danger); color: #fff; }
-    #repeatBtn { background: var(--accent); color: #fff; border: none; }
-    #repeatBtn:hover { background: var(--accent-hover); }
-    .status { text-align: center; margin-top: 10px; font-size: 0.8rem; color: #64748b; min-height: 1.2em; }
-    @media (max-width: 500px) {
-      .controls { flex-direction: column; }
-      .app-header { font-size: 1.25rem; }
+
+    /* Realistic Sketch Animation Keyframes */
+    @keyframes ds-sketch-reveal {
+      0% { filter: blur(8px) opacity(0); transform: scale(0.98); }
+      40% { filter: blur(4px) opacity(0.6); }
+      100% { filter: blur(0px) opacity(1); transform: scale(1); }
+    }
+    .ds-animating {
+      animation: ds-sketch-reveal 1.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
   </style>
-</head>
-<body>
-  <div class="digital-script-app">
-    <div class="app-header">DIGITAL SCRIPT by <span>OpangDarmawan</span></div>
-    <div class="canvas-wrapper" id="canvasContainer">
-      <canvas id="sketchCanvas"></canvas>
+
+  <div class="ds-header">
+    <h2>DIGITAL SCRIPT</h2>
+    <span>by OpangDarmawan</span>
+  </div>
+  
+  <div class="ds-toolbar">
+    <div class="ds-group">
+      <label>Brush Pen</label>
+      <select id="ds-brush">
+        <option value="pencil">Fine Pencil</option>
+        <option value="pen" selected>Standard Pen</option>
+        <option value="marker">Thick Marker</option>
+      </select>
     </div>
-    <div class="controls">
-      <div class="control-group">
-        <label class="control-label">Brush Pen</label>
-        <select id="brushType">
-          <option value="pencil">✏️ Pencil (Fine + Grain)</option>
-          <option value="pen">🖋️ Pen (Smooth + Consistent)</option>
-          <option value="charcoal">🌑 Charcoal (Soft + Textured)</option>
-          <option value="brush">🖌️ Brush (Variable Pressure)</option>
-        </select>
-      </div>
-      <div class="control-group">
-        <label class="control-label">Color</label>
-        <select id="colorType">
-          <option value="#111827">Black</option>
-          <option value="#4b5563">Dark Gray</option>
-          <option value="#2563eb">Ink Blue</option>
-          <option value="#dc2626">Crimson</option>
-          <option value="#78350f">Sepia</option>
-        </select>
-      </div>
-      <div class="control-group">
-        <label class="control-label">Actions</label>
-        <div style="display:flex; gap:8px;">
-          <button id="deleteBtn">🗑️ Delete</button>
-          <button id="repeatBtn">🔁 Repeat from Start</button>
-        </div>
-      </div>
+    
+    <div class="ds-group">
+      <label>Ink Color</label>
+      <select id="ds-color">
+        <option value="#1a202c">Midnight Black</option>
+        <option value="#2b6cb0">Royal Blue</option>
+        <option value="#c53030">Crimson Red</option>
+        <option value="#2f855a">Forest Green</option>
+        <option value="#6b46c1">Deep Purple</option>
+      </select>
     </div>
-    <div class="status" id="status">Draw freely to generate realistic sketch animation</div>
+    
+    <div class="ds-group">
+      <label>Sketch Style</label>
+      <select id="ds-style">
+        <option value="none">Original Scribble</option>
+        <option value="pencil_sketch">Realistic Pencil Sketch</option>
+        <option value="ink_brush">Bold Ink Brush</option>
+        <option value="charcoal">Soft Charcoal</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="ds-canvas-container" id="ds-canvas-container">
+    <canvas id="ds-canvas"></canvas>
+  </div>
+
+  <div class="ds-actions">
+    <button id="ds-undo" class="ds-btn ds-btn-undo" title="Repeat steps backward until the beginning">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+      Undo (Repeat)
+    </button>
+    <button id="ds-clear" class="ds-btn ds-btn-delete" title="Delete all and start over">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      Delete (Clear)
+    </button>
+    <button id="ds-generate" class="ds-btn ds-btn-generate" title="Apply AI-like sketch animation filter">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Generate Sketch Animation
+    </button>
+  </div>
+  
+  <div class="ds-footer">
+    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    100% Client-Side Processing • No API Key Required • Unlimited & Secure
   </div>
 
   <script>
     (function() {
-      'use strict';
-      const canvas = document.getElementById('sketchCanvas');
-      const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true });
-      const container = document.getElementById('canvasContainer');
-      const brushSelect = document.getElementById('brushType');
-      const colorSelect = document.getElementById('colorType');
-      const deleteBtn = document.getElementById('deleteBtn');
-      const repeatBtn = document.getElementById('repeatBtn');
-      const statusEl = document.getElementById('status');
-
+      const canvas = document.getElementById('ds-canvas');
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      const container = document.getElementById('ds-canvas-container');
+      
+      let history = [];
+      let historyStep = -1;
       let isDrawing = false;
-      let points = [];
-      let strokeHistory = []; // {points, brush, color, timestamp}
-      let animationId = null;
-      let currentBrush = brushSelect.value;
-      let currentColor = colorSelect.value;
+      let lastX = 0;
+      let lastY = 0;
 
-      // Canvas setup
-      function resizeCanvas() {
-        const dpr = window.devicePixelRatio || 1;
+      // Initialize Canvas Resolution
+      function initCanvas() {
         const rect = container.getBoundingClientRect();
-        canvas.width = rect.width * dpr;
-        canvas.height = rect.height * dpr;
-        ctx.scale(dpr, dpr);
-        canvas.style.width = `${rect.width}px`;
-        canvas.style.height = `${rect.height}px`;
-        redrawHistory();
+        canvas.width = rect.width;
+        canvas.height = 400;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        saveState();
       }
-      window.addEventListener('resize', resizeCanvas);
-      resizeCanvas();
+      
+      // Delay init slightly to ensure container is fully rendered in website builders
+      setTimeout(initCanvas, 150);
 
-      // Brush engine
-      const brushPresets = {
-        pencil: { width: 1.2, lineCap: 'round', lineJoin: 'round', grain: 0.3, pressure: false },
-        pen:    { width: 1.8, lineCap: 'square', lineJoin: 'round', grain: 0, pressure: false },
-        charcoal: { width: 3.5, lineCap: 'round', lineJoin: 'round', grain: 0.6, pressure: true },
-        brush:  { width: 2.5, lineCap: 'round', lineJoin: 'round', grain: 0.1, pressure: true }
-      };
+      function saveState() {
+        historyStep++;
+        if (historyStep < history.length) {
+          history.length = historyStep; // Truncate redo history if we draw after undoing
+        }
+        history.push(canvas.toDataURL());
+        // Limit history to 20 steps to prevent browser memory bloat
+        if (history.length > 20) {
+          history.shift();
+          historyStep--;
+        }
+      }
 
-      // Drawing logic
-      function getPos(e) {
+      function undo() {
+        if (historyStep > 0) {
+          historyStep--;
+          const img = new Image();
+          img.src = history[historyStep];
+          img.onload = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
+          };
+        }
+      }
+
+      function clearCanvas() {
+        if(confirm('Are you sure you want to delete everything and start over?')) {
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          saveState();
+        }
+      }
+
+      function getBrushSettings() {
+        const brush = document.getElementById('ds-brush').value;
+        const color = document.getElementById('ds-color').value;
+        
+        ctx.strokeStyle = color;
+        
+        if (brush === 'pencil') {
+          ctx.lineWidth = 2;
+          ctx.globalAlpha = 0.85;
+          ctx.shadowBlur = 0;
+        } else if (brush === 'pen') {
+          ctx.lineWidth = 4;
+          ctx.globalAlpha = 1.0;
+          ctx.shadowBlur = 0;
+        } else if (brush === 'marker') {
+          ctx.lineWidth = 14;
+          ctx.globalAlpha = 0.6;
+          ctx.shadowBlur = 3;
+          ctx.shadowColor = color;
+        }
+      }
+
+      function getCoordinates(e) {
         const rect = canvas.getBoundingClientRect();
-        const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-        const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
-        return { x, y };
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return {
+          x: clientX - rect.left,
+          y: clientY - rect.top
+        };
       }
 
-      function startDraw(e) {
-        if (animationId) cancelAnimationFrame(animationId);
+      function startDrawing(e) {
         isDrawing = true;
-        points = [];
-        const pos = getPos(e);
-        points.push(pos);
-        e.preventDefault();
+        const coords = getCoordinates(e);
+        lastX = coords.x;
+        lastY = coords.y;
+        getBrushSettings();
       }
 
       function draw(e) {
         if (!isDrawing) return;
-        e.preventDefault();
-        const pos = getPos(e);
-        const prev = points[points.length - 1];
-        const velocity = Math.hypot(pos.x - prev.x, pos.y - prev.y);
+        e.preventDefault(); // Critical: prevents scrolling on mobile while drawing
+        const coords = getCoordinates(e);
         
-        points.push({ x: pos.x, y: pos.y, velocity, timestamp: Date.now() });
-        renderStrokeSegment(prev, pos, velocity);
-      }
-
-      function endDraw() {
-        if (!isDrawing || points.length < 2) return;
-        isDrawing = false;
-        strokeHistory.push({
-          points: [...points],
-          brush: currentBrush,
-          color: currentColor,
-          completed: Date.now()
-        });
-        statusEl.textContent = `✅ Sketch captured. ${strokeHistory.length} strokes saved.`;
-      }
-
-      function renderStrokeSegment(p1, p2, velocity) {
-        const preset = brushPresets[currentBrush];
-        ctx.strokeStyle = currentColor;
-        ctx.lineCap = preset.lineCap;
-        ctx.lineJoin = preset.lineJoin;
-        ctx.lineWidth = preset.pressure ? Math.max(1, preset.width * (1 - velocity * 0.05)) : preset.width;
-        ctx.globalAlpha = 0.9;
-
-        // Procedural grain simulation
-        if (preset.grain > 0) {
-          const segments = Math.max(1, Math.floor(preset.width * 2));
-          for (let i = 0; i < segments; i++) {
-            ctx.beginPath();
-            const offset = (Math.random() - 0.5) * preset.grain * 3;
-            ctx.moveTo(p1.x + offset, p1.y + offset);
-            ctx.quadraticCurveTo(
-              (p1.x + p2.x) / 2 + offset,
-              (p1.y + p2.y) / 2 + offset,
-              p2.x + offset, p2.y + offset
-            );
-            ctx.stroke();
-          }
-        } else {
-          ctx.beginPath();
-          ctx.moveTo(p1.x, p1.y);
-          ctx.lineTo(p2.x, p2.y);
-          ctx.stroke();
-        }
-        ctx.globalAlpha = 1;
-      }
-
-      function redrawHistory() {
-        ctx.clearRect(0, 0, canvas.width / (window.devicePixelRatio || 1), canvas.height / (window.devicePixelRatio || 1));
-        strokeHistory.forEach(stroke => {
-          for (let i = 1; i < stroke.points.length; i++) {
-            renderStrokeSegment(stroke.points[i-1], stroke.points[i], stroke.points[i].velocity || 1);
-          }
-        });
-      }
-
-      // Animation replay
-      function replayAnimation() {
-        if (strokeHistory.length === 0) {
-          statusEl.textContent = "Nothing to replay. Draw something first.";
-          return;
-        }
-        statusEl.textContent = "🔁 Replaying sketch animation from start...";
-        ctx.clearRect(0, 0, canvas.width / (window.devicePixelRatio || 1), canvas.height / (window.devicePixelRatio || 1));
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(coords.x, coords.y);
+        ctx.stroke();
         
-        let strokeIndex = 0;
-        let pointIndex = 0;
-        const totalPoints = strokeHistory.reduce((sum, s) => sum + s.points.length, 0);
-        let renderedPoints = 0;
-
-        function step() {
-          if (strokeIndex >= strokeHistory.length) {
-            statusEl.textContent = "✅ Animation complete.";
-            return;
-          }
-          const stroke = strokeHistory[strokeIndex];
-          const preset = brushPresets[stroke.brush];
-          currentBrush = stroke.brush;
-          currentColor = stroke.color;
-          
-          ctx.strokeStyle = currentColor;
-          ctx.lineCap = preset.lineCap;
-          ctx.lineJoin = preset.lineJoin;
-          
-          if (pointIndex < stroke.points.length - 1) {
-            const p1 = stroke.points[pointIndex];
-            const p2 = stroke.points[pointIndex + 1];
-            const vel = p2.velocity || 1;
-            renderStrokeSegment(p1, p2, vel);
-            pointIndex++;
-            renderedPoints++;
-          } else {
-            strokeIndex++;
-            pointIndex = 0;
-          }
-          animationId = requestAnimationFrame(step);
-        }
-        animationId = requestAnimationFrame(step);
+        lastX = coords.x;
+        lastY = coords.y;
       }
 
-      // Event Listeners
-      canvas.addEventListener('mousedown', startDraw);
+      function stopDrawing() {
+        if (isDrawing) {
+          isDrawing = false;
+          ctx.beginPath(); // Reset path to prevent connecting separate lines
+          saveState();
+        }
+      }
+
+      // Mouse Events
+      canvas.addEventListener('mousedown', startDrawing);
       canvas.addEventListener('mousemove', draw);
-      canvas.addEventListener('mouseup', endDraw);
-      canvas.addEventListener('mouseleave', endDraw);
+      canvas.addEventListener('mouseup', stopDrawing);
+      canvas.addEventListener('mouseout', stopDrawing);
       
-      canvas.addEventListener('touchstart', startDraw, { passive: false });
+      // Touch Events (Mobile Support)
+      canvas.addEventListener('touchstart', startDrawing, { passive: false });
       canvas.addEventListener('touchmove', draw, { passive: false });
-      canvas.addEventListener('touchend', endDraw);
+      canvas.addEventListener('touchend', stopDrawing);
 
-      brushSelect.addEventListener('change', (e) => { currentBrush = e.target.value; });
-      colorSelect.addEventListener('change', (e) => { currentColor = e.target.value; });
-
-      deleteBtn.addEventListener('click', () => {
-        if (animationId) cancelAnimationFrame(animationId);
-        strokeHistory = [];
-        points = [];
-        ctx.clearRect(0, 0, canvas.width / (window.devicePixelRatio || 1), canvas.height / (window.devicePixelRatio || 1));
-        statusEl.textContent = "🗑️ Canvas cleared. Start fresh.";
+      // Button Actions
+      document.getElementById('ds-undo').addEventListener('click', undo);
+      document.getElementById('ds-clear').addEventListener('click', clearCanvas);
+      
+      document.getElementById('ds-generate').addEventListener('click', () => {
+        const style = document.getElementById('ds-style').value;
+        if (style === 'none') return;
+        
+        saveState(); // Save before transformation
+        
+        const w = canvas.width;
+        const h = canvas.height;
+        const off = document.createElement('canvas');
+        off.width = w;
+        off.height = h;
+        const offCtx = off.getContext('2d');
+        
+        // Algorithmic "AI" Sketch Generation (No API Required)
+        if (style === 'pencil_sketch') {
+          // Step 1: Base Grayscale
+          offCtx.filter = 'grayscale(100%)';
+          offCtx.drawImage(canvas, 0, 0);
+          
+          // Step 2: Inverted + Blurred layer with Color-Dodge blend mode
+          offCtx.globalCompositeOperation = 'color-dodge';
+          offCtx.filter = 'grayscale(100%) invert(100%) blur(5px)';
+          offCtx.drawImage(canvas, 0, 0);
+          
+          ctx.clearRect(0, 0, w, h);
+          ctx.drawImage(off, 0, 0);
+          
+        } else if (style === 'ink_brush') {
+          // High contrast threshold simulation
+          offCtx.filter = 'grayscale(100%) contrast(250%) brightness(130%)';
+          offCtx.drawImage(canvas, 0, 0);
+          ctx.clearRect(0, 0, w, h);
+          ctx.drawImage(off, 0, 0);
+          
+        } else if (style === 'charcoal') {
+          // Softened, textured look
+          offCtx.filter = 'grayscale(100%) contrast(160%) blur(1.5px)';
+          offCtx.drawImage(canvas, 0, 0);
+          ctx.clearRect(0, 0, w, h);
+          ctx.globalCompositeOperation = 'multiply';
+          ctx.drawImage(off, 0, 0);
+          ctx.globalCompositeOperation = 'source-over';
+        }
+        
+        // Reset context states
+        ctx.filter = 'none';
+        offCtx.filter = 'none';
+        offCtx.globalCompositeOperation = 'source-over';
+        
+        // Trigger CSS Animation
+        canvas.classList.remove('ds-animating');
+        void canvas.offsetWidth; // Force reflow to restart animation
+        canvas.classList.add('ds-animating');
+        
+        saveState(); // Save the generated state
       });
 
-      repeatBtn.addEventListener('click', replayAnimation);
     })();
   </script>
-</body>
-</html>
+</div>
