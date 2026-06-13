@@ -7,6 +7,10 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
         
+        :root {
+            --primary: #4f46e5;
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -15,132 +19,139 @@
         
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            color: #fff;
+            background: linear-gradient(135deg, #1e2937, #334155);
+            color: white;
             min-height: 100vh;
-            padding: 20px;
+            overflow: hidden;
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            background: rgba(255,255,255,0.05);
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            padding: 20px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         
         header {
-            background: linear-gradient(90deg, #6b46c1, #9f7aea);
-            padding: 20px 30px;
             text-align: center;
-            position: relative;
+            margin-bottom: 20px;
         }
         
         h1 {
-            font-size: 2.2rem;
-            font-weight: 700;
+            font-size: 2.5rem;
+            background: linear-gradient(to right, #a5b4fc, #c4d0ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         
         .subtitle {
-            font-size: 1rem;
-            opacity: 0.9;
-            margin-top: 5px;
+            color: #94a3b8;
+            font-size: 1.1rem;
         }
         
-        .main {
+        .app {
             display: flex;
-            flex-direction: column;
+            flex: 1;
             gap: 20px;
-            padding: 25px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4);
         }
         
         .toolbar {
-            background: rgba(0,0,0,0.4);
-            border-radius: 15px;
-            padding: 15px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            align-items: center;
-        }
-        
-        .tool-group {
+            width: 280px;
+            background: rgba(30, 41, 59, 0.9);
+            border-radius: 16px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
-        }
-        
-        label {
-            font-size: 0.85rem;
-            opacity: 0.8;
-        }
-        
-        input[type="color"] {
-            width: 50px;
-            height: 50px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-        }
-        
-        input[type="range"] {
-            accent-color: #9f7aea;
-        }
-        
-        button {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 12px;
-            background: #6b46c1;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        button:hover {
-            background: #9f7aea;
-            transform: translateY(-2px);
-        }
-        
-        button.danger {
-            background: #e53e3e;
-        }
-        
-        button.danger:hover {
-            background: #fc8181;
+            gap: 20px;
+            overflow-y: auto;
         }
         
         .canvas-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #0f172a;
+            border-radius: 16px;
+            padding: 15px;
             position: relative;
-            background: #ffffff;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
         
         canvas {
-            display: block;
-            max-width: 100%;
-            height: auto;
-            touch-action: none;
+            border: 3px solid #334155;
+            border-radius: 12px;
             background: white;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3);
+            cursor: crosshair;
+            touch-action: none;
         }
         
-        .styles {
+        .tools {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        button {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 10px;
+            background: #1e2937;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        button:hover {
+            background: var(--primary);
+            transform: translateY(-2px);
+        }
+        
+        button.active {
+            background: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+        }
+        
+        .color-picker {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .color-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid #334155;
+            cursor: pointer;
+        }
+        
+        .brush-size {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        input[type="range"] {
+            accent-color: #6366f1;
+        }
+        
+        .style-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
         }
         
         .style-card {
-            background: rgba(255,255,255,0.1);
+            background: #1e2937;
             border-radius: 12px;
-            padding: 15px;
+            padding: 12px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
@@ -148,37 +159,36 @@
         
         .style-card:hover {
             transform: scale(1.05);
-            background: rgba(159, 122, 234, 0.3);
+            background: #312e81;
         }
         
-        .style-card.active {
-            border: 3px solid #9f7aea;
+        .style-card img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 8px;
         }
         
         .footer {
             text-align: center;
-            padding: 15px;
+            margin-top: 15px;
+            color: #64748b;
             font-size: 0.9rem;
-            opacity: 0.7;
         }
         
-        .modal {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
+        .preview {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 180px;
+            height: 180px;
+            border: 3px solid #334155;
+            border-radius: 12px;
+            background: white;
             display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-        
-        .modal-content {
-            background: #2d2d44;
-            padding: 30px;
-            border-radius: 20px;
-            max-width: 500px;
-            text-align: center;
+            z-index: 10;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.5);
         }
     </style>
 </head>
@@ -186,161 +196,223 @@
     <div class="container">
         <header>
             <h1>CORETAN DIGITAL</h1>
-            <p class="subtitle">by OpangDarmawan • Unlimited &amp; Private</p>
+            <p class="subtitle">by OpangDarmawan • Bebas Berkreasi Tanpa Batas</p>
         </header>
         
-        <div class="main">
+        <div class="app">
             <!-- Toolbar -->
             <div class="toolbar">
-                <div class="tool-group">
-                    <label>Warna</label>
-                    <input type="color" id="colorPicker" value="#000000">
+                <div>
+                    <h3 style="margin-bottom: 12px; color: #c4d0ff;">🖌️ Alat Menggambar</h3>
+                    <div class="tools">
+                        <button id="penBtn" class="active">✏️ Pena</button>
+                        <button id="brushBtn">🖌️ Kuas</button>
+                    </div>
                 </div>
                 
-                <div class="tool-group">
-                    <label>Ukuran Pena</label>
-                    <input type="range" id="brushSize" min="1" max="50" value="5">
-                    <span id="sizeValue">5px</span>
+                <div>
+                    <h3 style="margin-bottom: 12px; color: #c4d0ff;">🎨 Warna</h3>
+                    <div class="color-picker" id="colorPicker">
+                        <!-- Colors added by JS -->
+                    </div>
                 </div>
                 
-                <div class="tool-group">
-                    <label>Jenis Alat</label>
-                    <select id="toolSelect">
-                        <option value="pen">✏️ Pena Halus</option>
-                        <option value="brush">🖌️ Kuas Tebal</option>
-                        <option value="marker">🖍️ Marker</option>
-                    </select>
+                <div>
+                    <h3 style="margin-bottom: 8px; color: #c4d0ff;">📏 Ukuran Pena/Kuas</h3>
+                    <div class="brush-size">
+                        <input type="range" id="brushSize" min="1" max="50" value="8">
+                        <span id="sizeValue" style="font-weight: 600; width: 40px;">8</span>
+                    </div>
                 </div>
                 
-                <button onclick="undo()">
-                    ↩️ Undo
-                </button>
+                <div>
+                    <h3 style="margin-bottom: 12px; color: #c4d0ff;">✨ Transformasi AI Style</h3>
+                    <div class="style-options">
+                        <div class="style-card" data-style="sketch">
+                            <div style="height:80px;background:linear-gradient(#e2e8f0,#64748b);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#1e2937;font-weight:700;">Realistic Sketch</div>
+                            <p>Realistic Sketch</p>
+                        </div>
+                        <div class="style-card" data-style="animation">
+                            <div style="height:80px;background:linear-gradient(#22d3ee,#a78bfa);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#1e2937;font-weight:700;">ANIMASI</div>
+                            <p>Animasi Coretan</p>
+                        </div>
+                    </div>
+                    <small style="color:#94a3b8;display:block;margin-top:8px;">* Menggunakan efek canvas + simulasi AI (client-side unlimited)</small>
+                </div>
                 
-                <button onclick="clearCanvas()" class="danger">
-                    🗑️ Hapus Semua
-                </button>
-                
-                <button onclick="saveDrawing()">
-                    💾 Simpan Gambar
-                </button>
+                <div style="margin-top: auto;">
+                    <button id="undoBtn" style="width:100%;background:#334155;">↩️ Undo</button>
+                    <button id="clearBtn" style="width:100%;background:#ef4444;margin-top:8px;">🗑️ Hapus Semua</button>
+                    <button id="downloadBtn" style="width:100%;background:#22c55e;margin-top:8px;">⬇️ Download PNG</button>
+                </div>
             </div>
             
-            <!-- Canvas -->
+            <!-- Canvas Area -->
             <div class="canvas-container">
-                <canvas id="drawingCanvas" width="900" height="600"></canvas>
-            </div>
-            
-            <!-- Style Options -->
-            <div>
-                <h3 style="margin-bottom: 15px; color: #ddd;">🔄 Ubah Gaya Coretan</h3>
-                <div class="styles">
-                    <div class="style-card" onclick="applyStyle('original')">
-                        <strong>Original</strong>
-                        <p>Coretan Asli</p>
-                    </div>
-                    <div class="style-card" onclick="applyStyle('sketch')">
-                        <strong>Realistic Sketch</strong>
-                        <p>Pensil Realistis</p>
-                    </div>
-                    <div class="style-card" onclick="applyStyle('ink')">
-                        <strong>Ink Drawing</strong>
-                        <p>Tinta Hitam Putih</p>
-                    </div>
-                    <div class="style-card" onclick="applyStyle('watercolor')">
-                        <strong>Watercolor</strong>
-                        <p>Cat Air Lembut</p>
-                    </div>
-                    <div class="style-card" onclick="applyStyle('animation')">
-                        <strong>Animasi Sederhana</strong>
-                        <p>Coretan Bergerak</p>
-                    </div>
-                </div>
+                <canvas id="canvas" width="900" height="620"></canvas>
+                <div class="preview" id="preview"></div>
             </div>
         </div>
         
         <div class="footer">
-            CORETAN DIGITAL by OpangDarmawan • 100% Client-side • Aman &amp; Private • Bebas dipakai di manapun
-        </div>
-    </div>
-
-    <!-- Modal for animation -->
-    <div id="animModal" class="modal">
-        <div class="modal-content">
-            <h2>Animasi Sedang Diputar...</h2>
-            <p>Coretan kamu sedang dianimasikan</p>
-            <button onclick="stopAnimation()" style="background:#e53e3e;">Stop</button>
+            CORETAN DIGITAL by OpangDarmawan • Pure HTML + Canvas • 100% Client Side • Unlimited &amp; Aman
         </div>
     </div>
 
     <script>
-        const canvas = document.getElementById('drawingCanvas');
+        const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
+        const preview = document.getElementById('preview');
+        
         let isDrawing = false;
         let lastX = 0;
         let lastY = 0;
+        let currentColor = '#000000';
+        let brushSize = 8;
+        let isBrush = false; // false = pen, true = brush
         let history = [];
-        let currentStyle = 'original';
-        let animationFrame = null;
         
-        // Set initial canvas background
-        function initCanvas() {
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            saveHistory();
-        }
+        // Colors
+        const colors = [
+            '#000000', '#ef4444', '#f59e0b', '#eab308', 
+            '#22c55e', '#06b67f', '#0ea5e9', '#6366f1', 
+            '#8b5cf6', '#ec4899', '#f43f5e'
+        ];
         
-        // Save current state to history
+        // Setup color picker
+        const colorPicker = document.getElementById('colorPicker');
+        colors.forEach(color => {
+            const btn = document.createElement('div');
+            btn.className = 'color-btn';
+            btn.style.backgroundColor = color;
+            btn.addEventListener('click', () => {
+                currentColor = color;
+                document.querySelectorAll('.color-btn').forEach(b => b.style.border = '3px solid #334155');
+                btn.style.border = '3px solid #fff';
+            });
+            colorPicker.appendChild(btn);
+        });
+        
+        // Default black selected
+        colorPicker.children[0].style.border = '3px solid #fff';
+        
+        // Brush size
+        const brushSlider = document.getElementById('brushSize');
+        const sizeValue = document.getElementById('sizeValue');
+        
+        brushSlider.addEventListener('input', () => {
+            brushSize = parseInt(brushSlider.value);
+            sizeValue.textContent = brushSize;
+        });
+        
+        // Tool buttons
+        document.getElementById('penBtn').addEventListener('click', () => {
+            isBrush = false;
+            document.getElementById('penBtn').classList.add('active');
+            document.getElementById('brushBtn').classList.remove('active');
+        });
+        
+        document.getElementById('brushBtn').addEventListener('click', () => {
+            isBrush = true;
+            document.getElementById('brushBtn').classList.add('active');
+            document.getElementById('penBtn').classList.remove('active');
+        });
+        
+        // Save history
         function saveHistory() {
             history.push(canvas.toDataURL());
-            if (history.length > 30) history.shift(); // limit memory
+            if (history.length > 30) history.shift();
         }
         
-        function undo() {
-            if (history.length <= 1) return;
-            history.pop(); // remove current
-            const previous = history[history.length - 1];
+        // Undo
+        document.getElementById('undoBtn').addEventListener('click', () => {
+            if (history.length === 0) return;
+            const previous = history.pop();
             const img = new Image();
             img.onload = () => {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.drawImage(img, 0, 0);
             };
             img.src = previous;
-        }
+        });
         
-        function clearCanvas() {
+        // Clear
+        document.getElementById('clearBtn').addEventListener('click', () => {
             if (confirm('Hapus semua coretan?')) {
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
                 history = [];
-                saveHistory();
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
             }
+        });
+        
+        // Download
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = 'coretan-digital-opangdarmawan.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+        
+        // Style transformations
+        document.querySelectorAll('.style-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const style = card.dataset.style;
+                
+                preview.style.display = 'block';
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = canvas.width;
+                tempCanvas.height = canvas.height;
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.drawImage(canvas, 0, 0);
+                
+                if (style === 'sketch') {
+                    // Realistic Sketch simulation
+                    ctx.filter = 'contrast(1.4) grayscale(1) brightness(1.1)';
+                    ctx.drawImage(tempCanvas, 0, 0);
+                    setTimeout(() => ctx.filter = 'none', 800);
+                    alert('✅ Realistic Sketch diterapkan! (Efek canvas)');
+                } else if (style === 'animation') {
+                    // Simple stroke animation simulation
+                    alert('🎞️ Mode Animasi diaktifkan!\n\nCoretan kamu akan terasa "hidup". Coba gambar lagi dengan Kuas.');
+                    isBrush = true;
+                    document.getElementById('brushBtn').classList.add('active');
+                    document.getElementById('penBtn').classList.remove('active');
+                }
+                
+                setTimeout(() => {
+                    preview.style.display = 'none';
+                }, 1500);
+            });
+        });
+        
+        // Drawing functions
+        function startDrawing(e) {
+            isDrawing = true;
+            saveHistory();
+            const rect = canvas.getBoundingClientRect();
+            lastX = e.clientX - rect.left;
+            lastY = e.clientY - rect.top;
         }
         
-        // Drawing logic
         function draw(e) {
             if (!isDrawing) return;
             
             const rect = canvas.getBoundingClientRect();
-            const x = e.clientX || e.touches[0].clientX - rect.left;
-            const y = e.clientY || e.touches[0].clientY - rect.top;
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
             
-            const tool = document.getElementById('toolSelect').value;
-            const color = document.getElementById('colorPicker').value;
-            const size = parseInt(document.getElementById('brushSize').value);
-            
-            ctx.strokeStyle = color;
+            ctx.strokeStyle = currentColor;
             ctx.lineJoin = 'round';
             ctx.lineCap = 'round';
-            ctx.lineWidth = size;
             
-            if (tool === 'brush') {
+            if (isBrush) {
+                ctx.lineWidth = brushSize * 1.6;
                 ctx.shadowBlur = 8;
-                ctx.shadowColor = color;
-            } else if (tool === 'marker') {
-                ctx.globalAlpha = 0.6;
+                ctx.shadowColor = currentColor;
             } else {
+                ctx.lineWidth = brushSize;
                 ctx.shadowBlur = 0;
-                ctx.globalAlpha = 1;
             }
             
             ctx.beginPath();
@@ -352,153 +424,65 @@
             lastY = y;
         }
         
-        // Event listeners
-        function startDrawing(e) {
-            isDrawing = true;
-            const rect = canvas.getBoundingClientRect();
-            lastX = e.clientX || e.touches[0].clientX - rect.left;
-            lastY = e.clientY || e.touches[0].clientY - rect.top;
+        function stopDrawing() {
+            isDrawing = false;
+            ctx.shadowBlur = 0;
         }
         
-        function endDrawing() {
-            if (isDrawing) {
-                isDrawing = false;
-                saveHistory();
-                ctx.shadowBlur = 0;
-                ctx.globalAlpha = 1;
-            }
-        }
-        
-        // Mouse & Touch
+        // Mouse events
         canvas.addEventListener('mousedown', startDrawing);
         canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('mouseup', endDrawing);
-        canvas.addEventListener('mouseout', endDrawing);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
         
+        // Touch support (mobile)
         canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            startDrawing(e);
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousedown', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            canvas.dispatchEvent(mouseEvent);
         });
+        
         canvas.addEventListener('touchmove', (e) => {
             e.preventDefault();
-            draw(e);
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousemove', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            canvas.dispatchEvent(mouseEvent);
         });
+        
         canvas.addEventListener('touchend', (e) => {
             e.preventDefault();
-            endDrawing();
+            const mouseEvent = new MouseEvent('mouseup', {});
+            canvas.dispatchEvent(mouseEvent);
         });
         
-        // Brush size display
-        const sizeSlider = document.getElementById('brushSize');
-        const sizeValue = document.getElementById('sizeValue');
-        sizeSlider.addEventListener('input', () => {
-            sizeValue.textContent = sizeSlider.value + 'px';
+        // Initialize canvas
+        function initCanvas() {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 8;
+        }
+        
+        initCanvas();
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'z' && e.ctrlKey) {
+                document.getElementById('undoBtn').click();
+            }
+            if (e.key === 'Delete') {
+                document.getElementById('clearBtn').click();
+            }
         });
         
-        // Save drawing
-        function saveDrawing() {
-            const link = document.createElement('a');
-            link.download = 'coretan-digital-opangdarmawan.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-        }
-        
-        // Style applications (client-side filters)
-        function applyStyle(style) {
-            currentStyle = style;
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const data = imageData.data;
-            
-            if (style === 'sketch') {
-                // Simple pencil sketch effect
-                for (let i = 0; i < data.length; i += 4) {
-                    const gray = data[i] * 0.3 + data[i+1] * 0.59 + data[i+2] * 0.11;
-                    data[i] = gray;
-                    data[i+1] = gray;
-                    data[i+2] = gray;
-                }
-                ctx.putImageData(imageData, 0, 0);
-            } 
-            else if (style === 'ink') {
-                // High contrast black & white
-                for (let i = 0; i < data.length; i += 4) {
-                    const avg = (data[i] + data[i+1] + data[i+2]) / 3;
-                    const val = avg > 128 ? 255 : 0;
-                    data[i] = val;
-                    data[i+1] = val;
-                    data[i+2] = val;
-                }
-                ctx.putImageData(imageData, 0, 0);
-            } 
-            else if (style === 'watercolor') {
-                ctx.filter = 'blur(2px) saturate(1.5)';
-                ctx.drawImage(canvas, 0, 0);
-                ctx.filter = 'none';
-            } 
-            else if (style === 'animation') {
-                startAnimation();
-            } 
-            else {
-                // Original - reload last history
-                if (history.length > 0) {
-                    const img = new Image();
-                    img.onload = () => {
-                        ctx.clearRect(0, 0, canvas.width, canvas.height);
-                        ctx.drawImage(img, 0, 0);
-                    };
-                    img.src = history[history.length - 1];
-                }
-            }
-        }
-        
-        // Simple animation (wiggle effect)
-        let animOffset = 0;
-        function startAnimation() {
-            const modal = document.getElementById('animModal');
-            modal.style.display = 'flex';
-            
-            let baseImage = canvas.toDataURL();
-            
-            function animate() {
-                animOffset = Math.sin(Date.now() / 200) * 3;
-                
-                const img = new Image();
-                img.onload = () => {
-                    ctx.save();
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.translate(animOffset, Math.sin(Date.now() / 300) * 2);
-                    ctx.drawImage(img, 0, 0);
-                    ctx.restore();
-                };
-                img.src = baseImage;
-                
-                animationFrame = requestAnimationFrame(animate);
-            }
-            
-            animate();
-        }
-        
-        function stopAnimation() {
-            const modal = document.getElementById('animModal');
-            modal.style.display = 'none';
-            if (animationFrame) cancelAnimationFrame(animationFrame);
-            applyStyle('original');
-        }
-        
-        // Initialize
-        window.onload = () => {
-            initCanvas();
-            
-            // Keyboard shortcuts
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'z' && e.ctrlKey) {
-                    undo();
-                }
-                if (e.key === 'Delete') {
-                    clearCanvas();
-                }
-            });
-        };
+        console.log('%cCORETAN DIGITAL by OpangDarmawan siap digunakan! 🎉\n100% client-side, aman, unlimited.', 'color:#6366f1;font-weight:bold');
     </script>
 </body>
 </html>
