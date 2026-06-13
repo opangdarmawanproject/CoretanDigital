@@ -1,311 +1,206 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FREE Ai by OpangDarmawan - Image to Image</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0f172a; /* slate-900 */
-            color: #f8fafc; /* slate-50 */
-        }
-        
-        /* Custom scrollbar for text area */
-        textarea::-webkit-scrollbar {
-            width: 8px;
-        }
-        textarea::-webkit-scrollbar-track {
-            background: #1e293b;
-            border-radius: 4px;
-        }
-        textarea::-webkit-scrollbar-thumb {
-            background: #475569;
-            border-radius: 4px;
-        }
-        textarea::-webkit-scrollbar-thumb:hover {
-            background: #64748b;
-        }
-
-        .loader {
-            border: 3px solid #1e293b;
-            border-bottom-color: #3b82f6;
+        body { font-family: 'Inter', sans-serif; }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
-            display: inline-block;
-            box-sizing: border-box;
-            animation: rotation 1s linear infinite;
+            border-top: 4px solid white;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
         }
-
-        @keyframes rotation {
+        @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
-        .drop-active {
-            border-color: #3b82f6 !important;
-            background-color: rgba(59, 130, 246, 0.1) !important;
-        }
+        /* Hide scrollbar for clean embed */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body class="min-h-screen p-4 md:p-8 flex flex-col items-center justify-center">
+<body class="bg-slate-50 min-h-screen text-slate-800 flex items-center justify-center p-4">
 
-    <!-- Header -->
-    <header class="w-full max-w-5xl mb-8 text-center space-y-2">
-        <div class="inline-flex items-center justify-center space-x-2 bg-slate-800/50 border border-slate-700 px-4 py-1.5 rounded-full mb-2">
-            <i data-lucide="sparkles" class="w-4 h-4 text-blue-400"></i>
-            <span class="text-sm font-medium text-blue-200">100% Unlimited Generation</span>
+    <div class="w-full max-w-3xl bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-white text-center">
+            <h1 class="text-3xl font-extrabold tracking-tight">FREE Ai by OpangDarmawan</h1>
+            <p class="text-indigo-100 mt-2 text-sm">Image-to-Image Generator (Powered by AI)</p>
         </div>
-        <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 text-transparent bg-clip-text">
-            FREE Ai by OpangDarmawan
-        </h1>
-        <p class="text-slate-400 text-sm md:text-base max-w-2xl mx-auto">
-            Transform your images with AI. Upload a source image, describe what you want, and let the magic happen. Safe, fast, and entirely free.
-        </p>
-    </header>
 
-    <!-- Main App Container -->
-    <main class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-6 bg-slate-800/40 p-4 md:p-6 rounded-3xl border border-slate-700/50 shadow-2xl backdrop-blur-sm">
-        
-        <!-- Left Column: Input -->
-        <section class="flex flex-col space-y-6">
-            
-            <!-- Image Upload Area -->
+        <div class="p-6 md:p-8 space-y-6">
+            <!-- Upload Section -->
             <div class="space-y-2">
-                <label class="text-sm font-semibold text-slate-300 ml-1">Source Image</label>
-                <div id="dropzone" class="relative group border-2 border-dashed border-slate-600 bg-slate-800/80 rounded-2xl h-64 flex flex-col items-center justify-center text-center cursor-pointer transition-all hover:border-blue-500 hover:bg-slate-800 overflow-hidden" onclick="document.getElementById('fileInput').click()">
-                    
-                    <input type="file" id="fileInput" class="hidden" accept="image/png, image/jpeg, image/webp">
-                    
-                    <!-- Placeholder UI -->
-                    <div id="uploadPlaceholder" class="flex flex-col items-center space-y-3 p-6 pointer-events-none">
-                        <div class="p-4 bg-slate-700 rounded-full group-hover:scale-110 transition-transform">
-                            <i data-lucide="image-plus" class="w-8 h-8 text-blue-400"></i>
+                <label class="block text-sm font-semibold text-slate-700">1. Unggah Gambar Awal</label>
+                <div class="flex items-center justify-center w-full">
+                    <label for="image-upload" class="flex flex-col items-center justify-center w-full h-48 border-2 border-slate-300 border-dashed rounded-xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition relative overflow-hidden group">
+                        <div id="upload-placeholder" class="flex flex-col items-center justify-center pt-5 pb-6">
+                            <i class="fa-solid fa-cloud-arrow-up text-4xl text-slate-400 mb-3 group-hover:text-indigo-500 transition"></i>
+                            <p class="mb-2 text-sm text-slate-500"><span class="font-semibold">Klik untuk unggah</span> atau seret gambar</p>
+                            <p class="text-xs text-slate-400">PNG, JPG, JPEG</p>
                         </div>
-                        <div>
-                            <p class="text-base font-medium text-slate-200">Click to upload or drag & drop</p>
-                            <p class="text-xs text-slate-400 mt-1">PNG, JPG, or WEBP (Max 5MB)</p>
-                        </div>
-                    </div>
-
-                    <!-- Image Preview UI (Hidden initially) -->
-                    <div id="previewContainer" class="absolute inset-0 hidden w-full h-full bg-slate-900">
-                        <img id="previewImage" class="w-full h-full object-contain" src="" alt="Preview">
-                        <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <span class="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium border border-slate-600 shadow-lg flex items-center space-x-2">
-                                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-                                <span>Change Image</span>
-                            </span>
-                        </div>
-                    </div>
+                        <img id="image-preview" class="absolute inset-0 w-full h-full object-contain hidden bg-black/5" alt="Preview Gambar">
+                        <input id="image-upload" type="file" class="hidden" accept="image/*" />
+                    </label>
                 </div>
             </div>
 
-            <!-- Prompt Input Area -->
-            <div class="space-y-2 flex-grow flex flex-col">
-                <label for="promptInput" class="text-sm font-semibold text-slate-300 ml-1">What do you want to change?</label>
-                <textarea id="promptInput" class="w-full flex-grow min-h-[120px] bg-slate-800 border border-slate-600 rounded-2xl p-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none transition-all" placeholder="E.g., Turn this into a beautiful watercolor painting, add a futuristic cyberpunk city background, or make it look like a vintage photo..."></textarea>
+            <!-- Prompt Section -->
+            <div class="space-y-2">
+                <label for="prompt" class="block text-sm font-semibold text-slate-700">2. Deskripsikan Perubahan (Prompt)</label>
+                <textarea id="prompt" rows="3" class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition outline-none resize-none" placeholder="Contoh: Ubah gambar ini menjadi gaya lukisan cat air, atau tambahkan kacamata hitam..."></textarea>
             </div>
 
-            <!-- Generate Button -->
-            <button id="generateBtn" onclick="generateImage()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-6 rounded-2xl shadow-lg shadow-blue-500/20 transition-all active:scale-[0.98] flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                <i data-lucide="wand-2" id="btnIcon" class="w-5 h-5"></i>
-                <span id="btnText">Generate Image</span>
-                <span id="btnLoader" class="loader w-5 h-5 hidden"></span>
+            <!-- Action Button -->
+            <button id="generate-btn" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg transform transition hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-indigo-300 flex justify-center items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span id="btn-text">Hasilkan Gambar</span>
+                <div id="btn-spinner" class="spinner hidden"></div>
             </button>
-            
-            <!-- Error Message Box -->
-            <div id="errorMessage" class="hidden bg-red-500/10 border border-red-500/50 text-red-400 p-4 rounded-xl text-sm flex items-start space-x-3">
-                <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
-                <span id="errorText">An error occurred.</span>
+
+            <!-- Error Message -->
+            <div id="error-message" class="hidden p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 border border-red-200 text-center">
             </div>
 
-        </section>
-
-        <!-- Right Column: Output -->
-        <section class="flex flex-col space-y-2 h-full">
-            <label class="text-sm font-semibold text-slate-300 ml-1">Result</label>
-            <div class="flex-grow border border-slate-700 bg-slate-900 rounded-2xl relative overflow-hidden flex flex-col items-center justify-center min-h-[400px]">
-                
-                <!-- Empty State -->
-                <div id="resultPlaceholder" class="text-center p-6 flex flex-col items-center text-slate-500">
-                    <i data-lucide="sparkles" class="w-12 h-12 mb-4 opacity-50"></i>
-                    <p>Your generated masterpiece will appear here.</p>
+            <!-- Result Section -->
+            <div id="result-section" class="hidden space-y-2 pt-4 border-t border-slate-100">
+                <label class="block text-sm font-semibold text-slate-700">Hasil Gambar</label>
+                <div class="rounded-xl overflow-hidden border border-slate-200 bg-slate-100 flex items-center justify-center min-h-[300px] relative">
+                    <img id="result-image" class="max-w-full max-h-[500px] object-contain" alt="Hasil AI">
+                    <a id="download-btn" href="#" download="OpangDarmawan_AI_Result.jpg" class="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm text-slate-800 hover:text-indigo-600 p-3 rounded-full shadow-lg transition" title="Unduh Gambar">
+                        <i class="fa-solid fa-download"></i>
+                    </a>
                 </div>
-
-                <!-- Loading State -->
-                <div id="resultLoading" class="hidden absolute inset-0 bg-slate-900/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
-                    <span class="loader w-12 h-12 border-4 mb-4"></span>
-                    <p class="text-blue-400 font-medium animate-pulse">Ai is painting...</p>
-                </div>
-
-                <!-- Result Image -->
-                <img id="resultImage" class="hidden w-full h-full object-contain" src="" alt="Generated Result">
-
-                <!-- Download Button Overlay -->
-                <button id="downloadBtn" onclick="downloadImage()" class="hidden absolute bottom-4 right-4 bg-slate-800/90 hover:bg-slate-700 text-white p-3 rounded-full shadow-xl border border-slate-600 transition-all hover:scale-110 active:scale-95 group" title="Download Image">
-                    <i data-lucide="download" class="w-5 h-5 group-hover:text-blue-400 transition-colors"></i>
-                </button>
             </div>
-        </section>
-
-    </main>
-
-    <!-- Footer -->
-    <footer class="mt-12 text-slate-500 text-sm flex items-center space-x-2">
-        <span>Protected and built for GitHub Pages</span>
-        <i data-lucide="shield-check" class="w-4 h-4 text-emerald-500"></i>
-    </footer>
+        </div>
+        
+        <div class="bg-slate-50 p-4 text-center text-xs text-slate-400 border-t border-slate-100">
+            &copy; 2026 FREE Ai by OpangDarmawan. All rights reserved.
+        </div>
+    </div>
 
     <script>
-        // Initialize Lucide icons
-        lucide.createIcons();
-
-        // Environment Configuration
-        // The API Key is intentionally left blank here. The runtime environment or hosting server
-        // injects or provides the proxy for this request, making it safe for public repositories.
+        // Konfigurasi API yang disediakan oleh environment
         const apiKey = ""; 
-        const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=" + apiKey;
 
-        // State variables
-        let uploadedImageBase64 = "";
-        let uploadedImageMimeType = "";
-        let isGenerating = false;
+        // Elemen DOM
+        const imageUpload = document.getElementById('image-upload');
+        const uploadPlaceholder = document.getElementById('upload-placeholder');
+        const imagePreview = document.getElementById('image-preview');
+        const promptInput = document.getElementById('prompt');
+        const generateBtn = document.getElementById('generate-btn');
+        const btnText = document.getElementById('btn-text');
+        const btnSpinner = document.getElementById('btn-spinner');
+        const resultSection = document.getElementById('result-section');
+        const resultImage = document.getElementById('result-image');
+        const downloadBtn = document.getElementById('download-btn');
+        const errorMessage = document.getElementById('error-message');
 
-        // DOM Elements
-        const fileInput = document.getElementById('fileInput');
-        const dropzone = document.getElementById('dropzone');
-        const previewContainer = document.getElementById('previewContainer');
-        const previewImage = document.getElementById('previewImage');
-        const uploadPlaceholder = document.getElementById('uploadPlaceholder');
-        const promptInput = document.getElementById('promptInput');
-        const generateBtn = document.getElementById('generateBtn');
-        const btnIcon = document.getElementById('btnIcon');
-        const btnText = document.getElementById('btnText');
-        const btnLoader = document.getElementById('btnLoader');
-        const errorMessage = document.getElementById('errorMessage');
-        const errorText = document.getElementById('errorText');
-        const resultPlaceholder = document.getElementById('resultPlaceholder');
-        const resultLoading = document.getElementById('resultLoading');
-        const resultImage = document.getElementById('resultImage');
-        const downloadBtn = document.getElementById('downloadBtn');
+        let currentBase64Image = null;
+        let currentMimeType = null;
 
-        // Event Listeners for Drag & Drop
-        dropzone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropzone.classList.add('drop-active');
-        });
+        // Handle Image Upload & Preview
+        imageUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
 
-        dropzone.addEventListener('dragleave', () => {
-            dropzone.classList.remove('drop-active');
-        });
-
-        dropzone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropzone.classList.remove('drop-active');
-            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                handleFile(e.dataTransfer.files[0]);
-            }
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files && e.target.files.length > 0) {
-                handleFile(e.target.files[0]);
-            }
-        });
-
-        // File handling logic
-        function handleFile(file) {
-            // Check if file is an image
-            if (!file.type.startsWith('image/')) {
-                showError("Please upload a valid image file (PNG, JPG, WEBP).");
-                return;
-            }
-
-            // Check size (5MB max)
-            if (file.size > 5 * 1024 * 1024) {
-                showError("Image file size must be less than 5MB.");
-                return;
-            }
-
-            hideError();
+            currentMimeType = file.type;
             const reader = new FileReader();
             
-            reader.onload = (e) => {
-                const dataUrl = e.target.result;
-                const matches = dataUrl.match(/^data:(image\/[a-zA-Z+]+);base64,(.+)$/);
+            reader.onload = function(event) {
+                const dataUrl = event.target.result;
+                imagePreview.src = dataUrl;
+                imagePreview.classList.remove('hidden');
+                uploadPlaceholder.classList.add('hidden');
                 
-                if (matches) {
-                    uploadedImageMimeType = matches[1];
-                    uploadedImageBase64 = matches[2];
-                    
-                    // Update UI
-                    previewImage.src = dataUrl;
-                    uploadPlaceholder.classList.add('hidden');
-                    previewContainer.classList.remove('hidden');
-                }
+                // Extract base64 part
+                currentBase64Image = dataUrl.split(',')[1];
             };
             
             reader.readAsDataURL(file);
+            hideError();
+        });
+
+        // Tampilkan pesan error
+        function showError(msg) {
+            errorMessage.textContent = msg;
+            errorMessage.classList.remove('hidden');
         }
 
-        // Exponential backoff fetch
-        async function fetchWithRetry(url, options, maxRetries = 5) {
-            let retries = 0;
+        // Sembunyikan pesan error
+        function hideError() {
+            errorMessage.classList.add('hidden');
+        }
+
+        // Set state tombol loading
+        function setLoading(isLoading) {
+            if (isLoading) {
+                generateBtn.disabled = true;
+                btnText.textContent = "Memproses...";
+                btnSpinner.classList.remove('hidden');
+                resultSection.classList.add('hidden');
+                hideError();
+            } else {
+                generateBtn.disabled = false;
+                btnText.textContent = "Hasilkan Gambar";
+                btnSpinner.classList.add('hidden');
+            }
+        }
+
+        // Fetch dengan fungsi Exponential Backoff
+        async function fetchWithRetry(url, options, retries = 5) {
             const delays = [1000, 2000, 4000, 8000, 16000];
-            
-            while (retries < maxRetries) {
+            for (let i = 0; i < retries; i++) {
                 try {
                     const response = await fetch(url, options);
                     if (!response.ok) {
-                        const errorData = await response.json().catch(() => ({}));
-                        throw new Error(`API Error ${response.status}: ${errorData.error?.message || 'Failed to generate image'}`);
+                        throw new Error(`Gagal menghubungi server (Status: ${response.status})`);
                     }
                     return await response.json();
                 } catch (error) {
-                    retries++;
-                    console.warn(`Attempt ${retries} failed. Retrying...`);
-                    if (retries >= maxRetries) {
-                        throw error;
-                    }
-                    await new Promise(resolve => setTimeout(resolve, delays[retries - 1]));
+                    if (i === retries - 1) throw error;
+                    // Wait for the specified delay before retrying
+                    await new Promise(res => setTimeout(res, delays[i]));
                 }
             }
         }
 
-        // Main generation logic
-        async function generateImage() {
-            if (isGenerating) return;
+        // Handle Generate Button Click
+        generateBtn.addEventListener('click', async () => {
+            const promptText = promptInput.value.trim();
+
+            if (!currentBase64Image) {
+                showError("Mohon unggah gambar awal terlebih dahulu.");
+                return;
+            }
+            if (!promptText) {
+                showError("Mohon masukkan deskripsi (prompt) perubahan.");
+                return;
+            }
+
+            setLoading(true);
+
+            // Endpoint Model Image-to-Image (gemini-2.5-flash-image-preview)
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
             
-            const prompt = promptInput.value.trim();
-
-            // Validations
-            if (!uploadedImageBase64) {
-                showError("Please upload a source image first.");
-                return;
-            }
-            if (!prompt) {
-                showError("Please enter a description of what you want to change.");
-                promptInput.focus();
-                return;
-            }
-
-            // Set Loading UI
-            setLoadingState(true);
-            hideError();
-
             const payload = {
                 contents: [
                     {
                         role: "user",
                         parts: [
-                            { text: prompt },
+                            { text: promptText },
                             {
                                 inlineData: {
-                                    mimeType: uploadedImageMimeType,
-                                    data: uploadedImageBase64
+                                    mimeType: currentMimeType,
+                                    data: currentBase64Image
                                 }
                             }
                         ]
@@ -317,7 +212,7 @@
             };
 
             try {
-                const data = await fetchWithRetry(API_URL, {
+                const result = await fetchWithRetry(url, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -325,73 +220,31 @@
                     body: JSON.stringify(payload)
                 });
 
-                // Extract base64 image from response
-                const generatedBase64 = data.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+                // Ekstrak hasil gambar dari respon JSON
+                const generatedBase64 = result.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+                const generatedMimeType = result.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.mimeType || 'image/jpeg';
 
                 if (generatedBase64) {
-                    const resultMimeType = data.candidates[0].content.parts.find(p => p.inlineData).inlineData.mimeType || 'image/jpeg';
-                    const resultDataUrl = `data:${resultMimeType};base64,${generatedBase64}`;
+                    const imageSource = `data:${generatedMimeType};base64,${generatedBase64}`;
+                    resultImage.src = imageSource;
+                    downloadBtn.href = imageSource;
+                    resultSection.classList.remove('hidden');
                     
-                    // Display Result
-                    resultImage.src = resultDataUrl;
-                    resultImage.classList.remove('hidden');
-                    resultPlaceholder.classList.add('hidden');
-                    downloadBtn.classList.remove('hidden');
-                    downloadBtn.classList.add('flex');
+                    // Scroll ke hasil
+                    setTimeout(() => {
+                        resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 100);
                 } else {
-                    throw new Error("No image data received from the AI model.");
+                    showError("AI tidak mengembalikan gambar. Coba gunakan prompt yang berbeda.");
                 }
 
             } catch (error) {
-                showError(error.message || "Failed to generate image. Please try again.");
+                console.error("Error generation:", error);
+                showError("Terjadi kesalahan saat menghasilkan gambar. Silakan coba beberapa saat lagi.");
             } finally {
-                setLoadingState(false);
+                setLoading(false);
             }
-        }
-
-        function downloadImage() {
-            if (!resultImage.src) return;
-            
-            const a = document.createElement('a');
-            a.href = resultImage.src;
-            a.download = `opangdarmawan-ai-${Date.now()}.jpg`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        // UI Helpers
-        function setLoadingState(isLoading) {
-            isGenerating = isLoading;
-            generateBtn.disabled = isLoading;
-            
-            if (isLoading) {
-                btnIcon.classList.add('hidden');
-                btnText.textContent = "Generating...";
-                btnLoader.classList.remove('hidden');
-                resultLoading.classList.remove('hidden');
-                resultImage.classList.add('hidden');
-                downloadBtn.classList.add('hidden');
-                downloadBtn.classList.remove('flex');
-            } else {
-                btnIcon.classList.remove('hidden');
-                btnText.textContent = "Generate Image";
-                btnLoader.classList.add('hidden');
-                resultLoading.classList.add('hidden');
-            }
-        }
-
-        function showError(message) {
-            errorText.textContent = message;
-            errorMessage.classList.remove('hidden');
-            errorMessage.classList.add('flex');
-        }
-
-        function hideError() {
-            errorMessage.classList.add('hidden');
-            errorMessage.classList.remove('flex');
-        }
-
+        });
     </script>
 </body>
 </html>
